@@ -131,7 +131,7 @@ export async function login(formData: FormData) {
   // code_challenge' must only contain unreserved characters
   const yourDomain = 'dev-6zbkrgtguww4sp3s.us.auth0.com';
   const yourClientId = 'C3YRvW2SPqgUMmo6i3t9YMXqeamaFfCH';
-  const yourCallbackUrl = 'http://localhost:3000/auth';
+  const yourCallbackUrl = process.env.BASE_URL ? `${process.env.BASE_URL}/auth` : 'http://localhost:3000/auth';
   const apiAudience = 'https://dev-6zbkrgtguww4sp3s.us.auth0.com/api/v2/';
   // how to generate state?
   const state = 'myspecialstate';
