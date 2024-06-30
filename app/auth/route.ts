@@ -22,7 +22,8 @@ export async function GET(request: Request) {
   // form.append('client_secret', '4CR88PQOJcT-LX6kMH677Vqy2kHNCortF9fNePXxCvbBEvHmZ')
   form.append('code_verifier', codeVerifier);
   form.append('code', searchParams.get('code'));
-  form.append('redirect_uri', 'http://localhost:3000/auth');
+  const redirectUri = process.env.BASE_URL ? `${process.env.BASE_URL}/auth` : 'http://localhost:3000/auth';
+  form.append('redirect_uri', redirectUri);
   const response = await fetch('https://dev-6zbkrgtguww4sp3s.us.auth0.com/oauth/token', {
     method: 'post',
     body: form,
@@ -87,7 +88,8 @@ export async function GET(request: Request) {
     }
   }
   console.log('everything looks good');
-  redirect('http://localhost:3000/dashboard');
+  let redirectUrl = process.env.BASE_URL ? `${process.env.BASE_URL}/dashboard` : 'http://localhost:3000/dashboard';
+  redirect(redirectUrl);
 
   // need to catch errors here
 
