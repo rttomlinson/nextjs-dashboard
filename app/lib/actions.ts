@@ -1,5 +1,5 @@
 'use server';
-import { sql } from '@vercel/postgres';
+// import { sql } from '@vercel/postgres';
 import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
@@ -14,6 +14,7 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 const { find } = require('geo-tz');
 const SESSION_ID_COOKIE_NAME = 'SESSION_ID';
+import { pool } from '@/app/lib/postgresConnection';
 
 const FormSchema = z.object({
   id: z.string(),
@@ -92,19 +93,24 @@ export async function createBet(previousState: State, formData: FormData) {
   const utcExpirationDateTime = dayjs.tz(datetime, IANAtimezoneOfLocationBet).utc(); // expirationDateTime.add(offset, 'minute');
 
   console.log(`expected ISO utc date ${utcExpirationDateTime.toISOString()}`);
-
+  const client = await pool.connect();
   // convert to UTC
   try {
-    await sql`
+    await client.query(
+      `
         INSERT INTO bets (user_id,   amount,           status, date,                            expiration_date,                 location)
-        VALUES           (${userId}, ${amountInCents}, 'placed', ${now.toISOString()}, ${utcExpirationDateTime.toISOString()}, point(${latitude},${longitude}))
-        `;
+        VALUES           ($1, $2, $3, $4, $5, point($6,$7));
+        `,
+      [userId, amountInCents, 'submitted', now.toISOString(), utcExpirationDateTime.toISOString(), latitude, longitude]
+    );
   } catch (error) {
     console.log(error);
     return {
       error: error,
       message: `Database Error: Failed to Create Bet. ${error.toString()}`
     };
+  } finally {
+    await client.release();
   }
   console.log('created bet');
   revalidatePath('/dashboard/bets');
@@ -190,4 +196,10 @@ export async function getUserIdFromSessionId(sessionId: string) {
   await redisClient.quit();
 
   return userId;
+}
+
+export async function recordLocation(formData: FormData) {
+  console.log("i'm server");
+
+  const rawFormData = {};
 }

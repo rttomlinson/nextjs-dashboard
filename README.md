@@ -132,4 +132,9 @@ docker run --rm --name redis-stack-server -p 6379:6379 redis/redis-stack-server:
 
 docker run --rm --name some-mongo -e MONGO_INITDB_ROOT_USERNAME=mongoadmin -e MONGO_INITDB_ROOT_PASSWORD=secret -p 27017:27017 mongo
 
-docker run --rm --name some-postgis -r POSTGRES_USER=postgres -e POSTGRES_PASSWORD=mysecretpassword postgis/postgis
+docker run --rm --name some-postgis -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=mysecretpassword -p 5432:5432 postgis/postgis
+docker run --rm --name some-bets-postgres -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=mysecretpassword -p 5432:5432 bets-postgres
+
+docker build -f Dockerfile.postgres -t bets-postgres .
+
+docker run --rm --hostname my-rabbit --name some-rabbit -p 5672:5672 rabbitmq:3

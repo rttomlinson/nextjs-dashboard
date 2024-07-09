@@ -1,0 +1,60 @@
+# Use the official PostgreSQL image as the base image
+FROM postgres:16
+
+#######################################################################
+# Source DockerHub / GitHub:
+# https://hub.docker.com/r/spitzenidee/postgresql_base/
+# https://github.com/spitzenidee/postgresql_base/
+#######################################################################
+
+#######################################################################
+# Prepare ENVs
+# ENV PG_CRON_VERSION           "1.4.2"
+# Set environment variables
+ENV POSTGRES_DB "betsapp"
+ENV POSTGRES_USER "postgres"
+ENV POSTGRES_PASSWORD "mysecretpassword"
+
+#######################################################################
+# Prepare the build requirements for the rdkit compilation:
+RUN apt-get update
+RUN apt-get upgrade -y
+#  && apt-get install -y --no-install-recommends \
+#     postgresql-server-dev-all postgresql-contrib \
+#     libcurl4-openssl-dev \
+#     wget jq cmake build-essential ca-certificates
+# Install pg_cron:
+RUN apt-get install -y postgresql-16-cron postgresql-16-postgis
+# Clean up:
+# RUN 
+# cd / && \
+#     rm -rf /build && \
+#     apt-get remove -y wget jq cmake build-essential ca-certificates && \
+#     apt-get autoremove --purge -y && \
+#     apt-get clean && \
+#     apt-get purge && \
+RUN    rm -rf /var/lib/apt/lists/*
+# Done.
+
+# Configure pg_cron
+
+# RUN echo "shared_preload_libraries = 'pg_cron'" >> /etc/postgresql/postgresql.conf
+# RUN echo "cron.database_name = 'postgres'" >> /etc/postgresql/postgresql.conf
+
+# COPY ./docker-entrypoint.sh /usr/local/bin/
+
+# RUN chmod a+x /usr/local/bin/docker-entrypoint.sh
+
+# ENTRYPOINT ["docker-entrypoint.sh"]
+
+EXPOSE 5432
+# CMD ["postgres"]
+
+# RUN useradd -ms /bin/bash postgres
+USER postgres
+RUN initdb
+RUN echo "host all all all trust" >> /var/lib/postgresql/data/pg_hba.conf
+RUN echo "shared_preload_libraries = 'pg_cron'" >> /var/lib/postgresql/data/postgresql.conf
+RUN echo "cron.database_name = 'postgres'" >> /var/lib/postgresql/data/postgresql.conf
+RUN pg_ctl start -w
+# RUN pg_ctl stop

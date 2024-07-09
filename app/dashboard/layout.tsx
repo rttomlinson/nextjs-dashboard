@@ -4,22 +4,31 @@ import { getUserIdFromSessionId } from '@/app/lib/actions';
 import { unstable_noStore } from 'next/cache';
 import { cookies } from 'next/headers'
 import { createClient } from 'redis';
-import { sql } from '@vercel/postgres'
+// import { sql } from '@vercel/postgres'
+import { pool } from '@/app/lib/postgresConnection';
+
+
+
 import { redirect } from 'next/navigation';
 const SESSION_ID_COOKIE_NAME = 'SESSION_ID';
 
 async function getUserBalance(userId) {
+    
+    const client = await pool.connect();
+    
     try {
-        const money = await sql`
+        const money = await client.query(`
         SELECT balance
         FROM accounts
-        WHERE user_id=${userId}
-        `;
+        WHERE user_id=$1
+        `, [userId]);
         console.log(money.rows[0])
         return money.rows[0].balance;
     } catch (error) {
         console.error('Database error. Fetching user money:', error)
         throw error;
+    } finally {
+        await client.release();
     }
 
 }   

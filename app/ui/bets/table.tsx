@@ -45,7 +45,7 @@ export default function BetsTable({
                 <div className="flex w-full items-center justify-between pt-4">
                   <div>
                     <p className="text-xl font-medium">
-                      {bet.amount}
+                      {(bet.amount / 100).toLocaleString("en-US", { style: "currency", currency: "USD"})}
                     </p>
                     <p>{formatDateToLocalWithTime(bet.created_time)}</p>
                   </div>
@@ -111,7 +111,7 @@ export default function BetsTable({
                     {bet.email}
                   </td> */}
                   <td className="whitespace-nowrap px-3 py-3">
-                    {bet.amount}
+                    {(bet.amount / 100).toLocaleString("en-US", { style: "currency", currency: "USD"})}
                   </td>
                   <td className="whitespace-nowrap px-3 py-3">
                     {formatDateToLocalWithTime(bet.created_time)}

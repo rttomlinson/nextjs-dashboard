@@ -6,7 +6,9 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
 import { unstable_noStore as noStore } from 'next/cache';
-import { sql } from '@vercel/postgres';
+// import { sql } from '@vercel/postgres';
+import { pool } from '@/app/lib/postgresConnection';
+
 // import { findDOMNode } from 'react-dom';
 const { find } = require('geo-tz');
 
@@ -38,9 +40,12 @@ async function fetchFilteredBets() {
   // get user id from session id
   const userId = await getUserIdFromSessionId(sessionId.value);
   noStore();
-
+  
+  const client = await pool.connect();
+  
   try {
-    const bets = await sql<BetsTable>`
+    
+    const bets = await client.query(`
       SELECT
         bets.id,
         bets.amount,
@@ -55,15 +60,17 @@ async function fetchFilteredBets() {
         bets.outcome
       FROM bets
       JOIN users ON bets.user_id = users.id
-      WHERE bets.user_id=${userId}
+      WHERE bets.user_id=$1
       ORDER BY bets.date DESC
       LIMIT 20
-    `;
+    `, [userId]);
     console.log(bets.rows)
     return bets.rows;
   } catch (error) {
     console.error('Database Error:', error);
     throw error;
+  } finally {
+    await client.release();
   }
 }
 
