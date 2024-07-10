@@ -26,50 +26,11 @@ let getLocationPromise = (): Promise<GeolocationPosition> => {
     };
 
 export default function Page() {
-
-    // async function onSubmit(event: FormEvent<HTMLFormElement>) {
-    //     event.preventDefault()
-     
-    //     const formData = new FormData(event.currentTarget)
-    //     const response = await fetch('/api/locations', {
-    //       method: 'POST',
-    //       body: formData,
-    //     })
-     
-    //     // Handle response if necessary
-    //     const data = await response.json()
-    //     console.log("event recorded!")
-        
-    //     // ...
-    //   }
     
     async function onClick() {
 
         const now = dayjs.utc();
         console.log(`before now: ${now}`)
-        // navigator.geolocation.getCurrentPosition(
-        //     async (position) => {
-        //         console.log("trying to resolve")
-        //         const latitude = position.coords.latitude;
-        //         const longitude = position.coords.longitude;
-        //         const formData = new FormData()
-        //         const response = await fetch('/api/locations', {
-        //             method: 'POST',
-        //             headers: {
-        //                 Accept: 'application/json',
-        //                 'Content-Type': 'application/json',
-        //             },
-        //             body: JSON.stringify({}),
-        //         })
-                
-        //         // Handle response if necessary
-        //         const data = await response.json()
-        //         console.log("event recorded!")
-
-        //     }, async (error) => {
-        //         console.error(error)
-        //     }
-        // )
         try {
 
             const position: GeolocationPosition = await getLocationPromise();
@@ -104,13 +65,7 @@ export default function Page() {
         } catch (err) {
             console.log("ERRRRRRRRRRRRRRR")
         }
-        
-
-        console.log(`after now: ${now}`)
-
-
     }
-    
 
     return (
         <main>
