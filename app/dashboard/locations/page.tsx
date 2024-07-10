@@ -4,12 +4,15 @@ import Breadcrumbs from '@/app/ui/bets/breadcrumbs';
 import { cookies } from 'next/headers';
 import { Button } from '@/app/ui/button'
 import { recordLocation } from '@/app/lib/actions'
-import React, { FormEvent } from 'react'
+import React, { FormEvent, useState } from 'react'
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
+import localizedFormat from "dayjs/plugin/localizedFormat";
 dayjs.extend(utc);
 dayjs.extend(timezone);
+dayjs.extend(localizedFormat)
+
 // const { find } = require('geo-tz');
 
 let getLocationPromise = (): Promise<GeolocationPosition> => {
@@ -26,6 +29,8 @@ let getLocationPromise = (): Promise<GeolocationPosition> => {
     };
 
 export default function Page() {
+
+    const [recordStatus, updateRecordStatus] = useState(null)
     
     async function onClick() {
 
@@ -62,6 +67,10 @@ export default function Page() {
             // Handle response if necessary
             const data = await response.json()
             console.log(data)
+            const localNow = dayjs.utc().local().format('L LTS');
+            updateRecordStatus({message: `Location recorded at ${localNow}`})
+
+
         } catch (err) {
             console.log("ERRRRRRRRRRRRRRR")
         }
@@ -78,6 +87,7 @@ export default function Page() {
                 },
                 ]}
             />
+            <h3>{recordStatus?.message}</h3>
             {/* <React.Suspense fallback="Loading..."> */}
             <Button onClick={onClick}>Record Location</Button>
             {/* </React.Suspense> */}
