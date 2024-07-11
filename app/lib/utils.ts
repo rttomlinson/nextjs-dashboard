@@ -16,8 +16,7 @@ export const formatDateToLocal = (dateStr: string, locale: string = 'en-US') => 
 
 export const formatDateToLocalWithTime = (dateStr: string, locale: string = 'en-US') => {
   // console.log('formatDateToLocalWithTime');
-  // console.log(dateStr);
-  const date = dayjs.utc(dateStr);
+  const date = dayjs(dateStr);
   const localDate = date.local();
 
   const options: Intl.DateTimeFormatOptions = {

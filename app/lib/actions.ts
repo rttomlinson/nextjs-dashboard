@@ -1,5 +1,4 @@
 'use server';
-// import { sql } from '@vercel/postgres';
 import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
@@ -16,21 +15,28 @@ const { find } = require('geo-tz');
 const SESSION_ID_COOKIE_NAME = 'SESSION_ID';
 import { pool } from '@/app/lib/postgresConnection';
 
+// Need to verify that datetime is in the future
 const FormSchema = z.object({
   id: z.string(),
   // userId: z.string(),
-  latitude: z.union([
-    z.coerce.number().gte(-90, { message: 'Latitude must be greater than or equal to -90 degrees' }),
-    z.coerce.number().lte(90, { message: 'Latitude must be less than or equal to 90 degrees' })
-  ]),
-  longitude: z.union([
-    z.coerce.number().gte(-180, { message: 'Longitude must be greater than or equal to -180 degrees' }),
-    z.coerce.number().lte(180, { message: 'Longitude must be less than or equal to 180 degrees' })
-  ]),
+  latitude: z.coerce.number().refine(
+    val => {
+      return val <= 90 && val >= -90;
+    },
+    {
+      message: 'Latitude must be between (inclusive) -90 degrees and 90 degrees'
+    }
+  ),
+  longitude: z.coerce.number().refine(
+    val => {
+      return val <= 180 && val >= -180;
+    },
+    {
+      message: 'Longitude must be between (inclusive) -180 degrees and 180 degrees'
+    }
+  ),
   amount: z.coerce.number().gt(0, { message: 'Please enter an amount greater than $0.' }),
-  // date: z.string(),
-  // duration: z.coerce.number(), // need to verify that expirationDate is after createDate
-  status: z.enum(['placed', 'open', 'closed', 'reconciled']),
+  status: z.enum(['submitted']),
   datetime: z.string(),
   offset: z.coerce
     .number()
@@ -43,9 +49,10 @@ const CreateBet = FormSchema.omit({ id: true, status: true });
 export type State = {
   errors?: {
     amount?: string[];
-    // duration?: string[];
     latitude?: string[];
     longitude?: string[];
+    offset?: string[];
+    datetime?: string[];
   };
   message?: string | null;
 };
@@ -66,7 +73,6 @@ export async function createBet(previousState: State, formData: FormData) {
     amount: formData.get('amount'),
     latitude: formData.get('latitude'),
     longitude: formData.get('longitude'),
-    // duration: formData.get('duration'),
     datetime: formData.get('datetime-local'),
     offset: formData.get('offset')
   });
@@ -74,18 +80,15 @@ export async function createBet(previousState: State, formData: FormData) {
     console.error(validatedFields.error);
     return {
       errors: validatedFields.error.flatten().fieldErrors,
-      message: 'Missing Fields. Failed to Create Bet'
+      message: 'Missing or invalid fields. Failed to create bet'
     };
   }
   const { amount, latitude, longitude, datetime, offset } = validatedFields.data;
-  console.log('show datetime');
-  console.log(datetime);
 
   const amountInCents = amount * 100;
   const now = dayjs.utc();
   // offset is minutes
   // cannot set a time in the past
-  // const expirationDateTime = dayjs.utc(datetime);
 
   const IANAtimezoneOfLocationBet = find(latitude, longitude);
   console.log(`IANAtimezoneOfLocationBet ${IANAtimezoneOfLocationBet}`);

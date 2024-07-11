@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import React from 'react';
+// import React from 'react';
 import { cookies } from 'next/headers';
 const SESSION_ID_COOKIE_NAME = 'SESSION_ID';
 import { createClient } from 'redis';

@@ -49,8 +49,8 @@ async function fetchFilteredBets() {
       SELECT
         bets.id,
         bets.amount,
-        TO_CHAR(bets.date, 'YYYY/MM/DD HH24:MM:SS') as created_time,
-        TO_CHAR(bets.expiration_date, 'YYYY/MM/DD HH24:MM:SS') as expiration_date,
+        bets.date as created_time,
+        bets.expiration_date as expiration_date,
         bets.location,
         bets.status,
         bets.user_id,
