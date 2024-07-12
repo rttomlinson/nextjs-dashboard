@@ -15,7 +15,6 @@ export const formatDateToLocal = (dateStr: string, locale: string = 'en-US') => 
 };
 
 export const formatDateToLocalWithTime = (dateStr: string, locale: string = 'en-US') => {
-  // console.log('formatDateToLocalWithTime');
   const date = dayjs(dateStr);
   const localDate = date.local();
 
@@ -33,8 +32,6 @@ export const formatDateToLocalWithTimeAndCoordinates = (
   locale: string = 'en-US'
 ) => {
   const date = dayjs.utc(dateStr);
-
-  // const localDate = date.local();
 
   const options: Intl.DateTimeFormatOptions = {
     dateStyle: 'full',
