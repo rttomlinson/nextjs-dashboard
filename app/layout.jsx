@@ -8,6 +8,7 @@ import Login from '@/app/ui/login';
 import { cookies } from 'next/headers'
 const SESSION_ID_COOKIE_NAME = 'SESSION_ID';
 import { AuthContextProvider } from '../stores/authContext'
+import {NextUIProvider} from "@nextui-org/system";
 import { createClient } from 'redis';
 
 async function getSessionData(sessionId){
@@ -63,14 +64,17 @@ export default function RootLayout({ children }) {
         { /* <link rel="stylesheet" href="https://cdn.auth0.com/js/auth0-samples-theme/1.0/css/auth0-theme.min.css" /> */}
       </head>
       <body>
-        <AuthContextProvider currentUser={currentUser}>
-          <main id="app" className="d-flex flex-column h-100" data-testid="layout">
-            {/* <NavBar /> */}
-            {/* <Container className="flex-grow-1 mt-5">{children}</Container> */}
-            <h1>Top level layout</h1>
-            <Container>{children}</Container>
-          </main>
-        </AuthContextProvider>
+        <NextUIProvider>
+          <AuthContextProvider currentUser={currentUser}>
+            <main id="app" className="d-flex flex-column h-100" data-testid="layout">
+              {/* <NavBar /> */}
+              {/* <Container className="flex-grow-1 mt-5">{children}</Container> */}
+              <h1>Top level layout</h1>
+              <Container>{children}</Container>
+            </main>
+          </AuthContextProvider>
+
+        </NextUIProvider>
         
       </body>
     </html>

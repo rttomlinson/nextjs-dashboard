@@ -6,6 +6,15 @@ import { formatDateToLocal, formatDateToLocalWithTime, formatDateToLocalWithTime
 
 import Link from 'next/link'
 
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableColumn,
+  TableRow,
+  TableCell
+} from "@nextui-org/react";
+
 export default function BetsTable({
   query,
   currentPage,
@@ -26,7 +35,7 @@ export default function BetsTable({
                 key={bet.id}
                 className="mb-2 w-full rounded-md bg-white p-4"
               >
-                <div className="flex items-center justify-between border-b pb-4">
+                {/* <div className="flex items-center justify-between border-b pb-4">
                   <div>
                     <div className="mb-2 flex items-center">
                       <Image
@@ -40,14 +49,15 @@ export default function BetsTable({
                     </div>
                     <p className="text-sm text-gray-500">{bet.email}</p>
                   </div>
-                  {/* <BetStatus status={bet.status} /> */}
-                </div>
+                  <BetStatus status={bet.status} />
+                </div> */}
                 <div className="flex w-full items-center justify-between pt-4">
                   <div>
                     <p className="text-xl font-medium">
                       {(bet.amount / 100).toLocaleString("en-US", { style: "currency", currency: "USD"})}
                     </p>
-                    <p>{formatDateToLocalWithTime(bet.created_time)}</p>
+                    <p>Expires:</p>
+                    <p>{formatDateToLocalWithTime(bet.expiration_date)}</p>
                   </div>
                   {/* <div className="flex justify-end gap-2">
                     <UpdateBet id={bet.id} />
@@ -60,17 +70,11 @@ export default function BetsTable({
           <table className="hidden min-w-full text-gray-900 md:table">
             <thead className="rounded-lg text-left text-sm font-normal">
               <tr>
-                <th scope="col" className="px-4 py-5 font-medium sm:pl-6">
-                  Customer
-                </th>
-                {/* <th scope="col" className="px-3 py-5 font-medium">
-                  Email
-                </th> */}
                 <th scope="col" className="px-3 py-5 font-medium">
                   Amount
                 </th>
                 <th scope="col" className="px-3 py-5 font-medium">
-                  Date
+                  Submitted Date
                 </th>
                 <th scope="col" className="px-3 py-5 font-medium">
                   Expiration Date
@@ -95,7 +99,7 @@ export default function BetsTable({
                   key={bet.id}
                   className="w-full border-b py-3 text-sm last-of-type:border-none [&:first-child>td:first-child]:rounded-tl-lg [&:first-child>td:last-child]:rounded-tr-lg [&:last-child>td:first-child]:rounded-bl-lg [&:last-child>td:last-child]:rounded-br-lg"
                 >
-                  <td className="whitespace-nowrap py-3 pl-6 pr-3">
+                  {/* <td className="whitespace-nowrap py-3 pl-6 pr-3">
                     <div className="flex items-center gap-3">
                       <Image
                         src={bet.image_url}
@@ -106,9 +110,6 @@ export default function BetsTable({
                       />
                       <p>{bet.name}</p>
                     </div>
-                  </td>
-                  {/* <td className="whitespace-nowrap px-3 py-3">
-                    {bet.email}
                   </td> */}
                   <td className="whitespace-nowrap px-3 py-3">
                     {(bet.amount / 100).toLocaleString("en-US", { style: "currency", currency: "USD"})}
