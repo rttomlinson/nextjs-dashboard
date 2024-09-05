@@ -58,7 +58,7 @@ export async function GET(request: Request) {
 
     const sessionId = crypto.randomUUID();
 
-    // look up user in users table based on email
+    // TODO: look up user in users table based on email
 
     const redisClient = createClient({
       url: process.env.KV_URL || 'redis://localhost:6379',
@@ -74,7 +74,9 @@ export async function GET(request: Request) {
     await redisClient.hSet(sessionId, {
       user_id: '410544b2-4001-4271-9855-fec4b6a6442a',
       name: payload['name'].toString(),
-      email: payload['email'].toString()
+      email: payload['email'].toString(),
+      image: payload['picture'].toString()
+      // 'https://media.npr.org/assets/img/2023/01/14/this-is-fine_custom-dcb93e90c4e1548ffb16978a5a8d182270c872a9-s1100-c50.jpg'
     });
     const value = await redisClient.hGetAll(sessionId);
     await redisClient.quit();

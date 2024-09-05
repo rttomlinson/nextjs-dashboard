@@ -1,15 +1,15 @@
-'use client'
-export default function UserInfo({currentUser, userBalance, recordStatus}) {
+'use client';
+export default function UserInfo({ currentUser, userBalance }) {
+  return (
+    <main>
+      <h3>Hello, {currentUser}</h3>
+      <p>
+        Your current balance is {(userBalance / 100).toLocaleString('en-US', { style: 'currency', currency: 'USD' })}
+      </p>
 
-    return (
-        <main>
-            <h1 className={`mb-4 text-x1 md:text-2x1`}>User</h1>
-            <h2>Hello, {currentUser}</h2>
-            <h3>Your current balance is {(userBalance / 100).toLocaleString("en-US", { style: "currency", currency: "USD"})}</h3>
-            
-            <h3>{recordStatus?.message}</h3>
+      {/* <h3>{recordStatus?.message}</h3> */}
 
-            {/* <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      {/* <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
                 <Suspense fallback={<CardsSkeleton />}>
                     <CardWrapper/>
                 </Suspense>
@@ -22,6 +22,6 @@ export default function UserInfo({currentUser, userBalance, recordStatus}) {
                     <LatestInvoices />
                 </Suspense>
             </div> */}
-        </main>
-            )
+    </main>
+  );
 }

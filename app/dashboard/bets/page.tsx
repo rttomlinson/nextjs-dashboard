@@ -1,19 +1,16 @@
 import { Metadata } from 'next';
 import Table from '@/app/ui/bets/table';
 import { getUserIdFromSessionId } from '@/app/lib/actions';
-// import { fetchFilteredBets } from '@/app/lib/data';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
 import { unstable_noStore as noStore } from 'next/cache';
-// import { sql } from '@vercel/postgres';
 import { pool } from '@/app/lib/postgresConnection';
 
-// import { findDOMNode } from 'react-dom';
 const { find } = require('geo-tz');
 
 export const metadata: Metadata = {
-  title: 'Bets',
+  title: 'Bets'
 };
 
 export type BetsTable = {
@@ -26,26 +23,16 @@ export type BetsTable = {
   expiration_date: string;
   amount: number;
   status: 'pending' | 'open' | 'closed' | 'reconciled';
-  location: {x: string, y: string};
-  outcome: string | null
+  location: { x: string; y: string };
+  outcome: string | null;
 };
 
-async function fetchFilteredBets() {
-  const cookieStore = cookies();
-  const sessionId = cookieStore.get('SESSION_ID');
-  if(!(sessionId && sessionId.value != '')) {
-    redirect("/")
-  }
-
-  // get user id from session id
-  const userId = await getUserIdFromSessionId(sessionId.value);
-  noStore();
-  
+async function fetchFilteredBets(userId: string) {
   const client = await pool.connect();
-  
+
   try {
-    
-    const bets = await client.query(`
+    const bets = await client.query(
+      `
       SELECT
         bets.id,
         bets.amount,
@@ -63,8 +50,10 @@ async function fetchFilteredBets() {
       WHERE bets.user_id=$1
       ORDER BY bets.date DESC
       LIMIT 20
-    `, [userId]);
-    console.log(bets.rows)
+    `,
+      [userId]
+    );
+    console.log(bets.rows);
     return bets.rows;
   } catch (error) {
     console.error('Database Error:', error);
@@ -75,42 +64,46 @@ async function fetchFilteredBets() {
 }
 
 export default async function Page({
-    searchParams,
+  searchParams
 }: {
-    searchParams?: {
-        query?: string;
-        page?: string;
-    };
+  searchParams?: {
+    query?: string;
+    page?: string;
+  };
 }) {
-
   const query = searchParams?.query || '';
   const currentPage = Number(searchParams?.page) || 1;
 
-  let bets = await fetchFilteredBets();
+  const cookieStore = cookies();
+  const sessionId = cookieStore.get('SESSION_ID');
+
+  // undefined means that SESSION_ID cookie not found
+  if (!sessionId) {
+    redirect('/');
+    // else if it is defined but is an empty string
+  } else if (sessionId?.value == '') {
+    redirect('/');
+  }
+  const userId = await getUserIdFromSessionId(sessionId.value);
+  // get user id from session id
+
+  let bets = await fetchFilteredBets(userId);
   //update each bet with iana based on coordinates
-  bets = bets.map((bet) => {
+  bets = bets.map(bet => {
     return {
       ...bet,
       IANAtimezone: find(bet.location.x, bet.location.y)[0]
-    }
-  })
-
+    };
+  });
+  noStore();
   //   const totalPages = await fetchInvoicesPages(query);
   return (
-    <div className="w-full">
-      <div className="flex w-full items-center justify-between">
-        <h1 className={`text-2xl`}>Bets</h1>
-      </div>
-      <div className="mt-4 flex items-center justify-between gap-2 md:mt-8">
-        {/* <Search placeholder="Search invoices..." />
-        <CreateInvoice /> */}
-      </div>
-        {/* <Suspense key={query + currentPage} fallback={<InvoicesTableSkeleton />}> */}
-        <Table query={query} currentPage={currentPage} bets={bets} />
+    <div>
+      <h1>Bets</h1>
+      {/* <Suspense key={query + currentPage} fallback={<InvoicesTableSkeleton />}> */}
+      <Table query={query} currentPage={currentPage} bets={bets} />
       {/* </Suspense> */}
-      <div className="mt-5 flex w-full justify-center">
-        {/* <Pagination totalPages={totalPages} /> */}
-      </div>
+      {/* <div className="mt-5 flex w-full justify-center"><Pagination totalPages={totalPages} /></div> */}
     </div>
   );
 }

@@ -14,11 +14,11 @@ dayjs.extend(timezone);
 const { find } = require('geo-tz');
 const SESSION_ID_COOKIE_NAME = 'SESSION_ID';
 import { pool } from '@/app/lib/postgresConnection';
+import { client } from '@/app/lib/redisConnection';
 
 // Need to verify that datetime is in the future
 const FormSchema = z.object({
   id: z.string(),
-  // userId: z.string(),
   latitude: z.coerce.number().refine(
     val => {
       return val <= 90 && val >= -90;
@@ -37,7 +37,7 @@ const FormSchema = z.object({
   ),
   amount: z.coerce.number().gt(0, { message: 'Please enter an amount greater than $0.' }),
   status: z.enum(['submitted']),
-  datetime: z.string(),
+  datetime: z.string(), // datetime must not be in the past for the intended location
   offset: z.coerce
     .number()
     .lt(720, { message: 'Offset cannot be greater than 12 hours behind' })
@@ -69,6 +69,9 @@ export async function createBet(previousState: State, formData: FormData) {
 
   console.log('creating bet');
 
+  if (formData.get('latitude') == '') formData.set('latitude', undefined);
+  if (formData.get('longitude') == '') formData.set('longitude', undefined);
+
   const validatedFields = CreateBet.safeParse({
     amount: formData.get('amount'),
     latitude: formData.get('latitude'),
@@ -84,11 +87,8 @@ export async function createBet(previousState: State, formData: FormData) {
     };
   }
   const { amount, latitude, longitude, datetime, offset } = validatedFields.data;
-
   const amountInCents = amount * 100;
   const now = dayjs.utc();
-  // offset is minutes
-  // cannot set a time in the past
 
   const IANAtimezoneOfLocationBet = find(latitude, longitude);
   console.log(`IANAtimezoneOfLocationBet ${IANAtimezoneOfLocationBet}`);
@@ -96,12 +96,22 @@ export async function createBet(previousState: State, formData: FormData) {
   const utcExpirationDateTime = dayjs.tz(datetime, IANAtimezoneOfLocationBet).utc(); // expirationDateTime.add(offset, 'minute');
 
   console.log(`expected ISO utc date ${utcExpirationDateTime.toISOString()}`);
+
+  // offset is minutes
+  // cannot set a time in the past
+  if (utcExpirationDateTime.diff(now) <= 0) {
+    return {
+      errors: { datetime: ['Expiration time cannot be in the past.'] },
+      message: 'Expiration time cannot be in the past.'
+    };
+  }
+
   const client = await pool.connect();
   // convert to UTC
   try {
     await client.query(
       `
-        INSERT INTO bets (user_id,   amount,           status, date,                            expiration_date,                 location)
+        INSERT INTO bets (user_id, amount, status, date, expiration_date, location)
         VALUES           ($1, $2, $3, $4, $5, point($6,$7));
         `,
       [userId, amountInCents, 'submitted', now.toISOString(), utcExpirationDateTime.toISOString(), latitude, longitude]
@@ -194,11 +204,53 @@ export async function getUserIdFromSessionId(sessionId: string) {
   redisClient.on('error', err => console.log('Redis Client Error', err));
   await redisClient.connect();
   const value = await redisClient.hGetAll(sessionId);
-  const userId = value['user_id'];
-  console.log(`user_id: ${userId}`);
+  // const userId = value['user_id'];
+  // console.log(`user_id: ${userId}`);
   await redisClient.quit();
+  // if sessionId is not found, then an empty object is returned
+  // if (Object.keys(value) == 0) {
+  //   return null;
+  // }
+  if (!value['user_id']) {
+    return null;
+  }
 
-  return userId;
+  return value['user_id'];
+  // return userId;
+}
+
+async function getSessionData(sessionId) {
+  const redisClient = client;
+  await redisClient.connect();
+  try {
+    const value = await redisClient.hGetAll(sessionId);
+    // if sessionId is not found, then an null object is returned
+    if (!value['user_id']) {
+      return null;
+    }
+    return value;
+  } catch (err) {
+    console.log(err);
+    throw err;
+  } finally {
+    await client.quit();
+  }
+}
+
+export async function getUser() {
+  const cookieStore = cookies();
+  const sessionIdCookie = cookieStore.get(SESSION_ID_COOKIE_NAME);
+  let currentUser = null;
+
+  let userProfileImage = null;
+  if (!(sessionIdCookie && sessionIdCookie.value != '')) {
+    currentUser = null; // No user
+  } else {
+    currentUser = await getSessionData(sessionIdCookie.value);
+    userProfileImage = currentUser?.image || 'some placeholder images';
+    currentUser = currentUser ? currentUser : null;
+  }
+  return { currentUser, userProfileImage };
 }
 
 export async function recordLocation(formData: FormData) {

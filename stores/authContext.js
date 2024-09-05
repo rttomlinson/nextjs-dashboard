@@ -10,10 +10,12 @@ const AuthContext = createContext({
 });
 
 export const AuthContextProvider = ({ children, currentUser }) => {
+  currentUser = JSON.parse(currentUser);
+  console.log(`authcontextprovider: ${currentUser} before update`);
   const [user, setUser] = useState(currentUser);
   const value = { user, setUser };
 
-  console.log(`authcontextprovider: client component authcontextprovider ${user}`);
+  console.log(`authcontextprovider: ${user} after update`);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

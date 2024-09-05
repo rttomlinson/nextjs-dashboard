@@ -30,8 +30,7 @@ export async function GET(request: Request) {
 
   // also should delete the session from redis
   console.log('session deleted');
-  // revalidatePath('/', 'layout');
-
+  revalidatePath('/'); //, 'layout');
   redirect('/');
 
   // return new Response('Deleted session', {
