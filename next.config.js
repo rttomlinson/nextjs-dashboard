@@ -7,10 +7,16 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'media.npr.org',
         port: '',
-        pathname: '/**',
+        pathname: '/**'
       },
-    ],
-  },
+      {
+        protocol: 'https',
+        hostname: 's.gravatar.com',
+        port: '',
+        pathname: '/**'
+      }
+    ]
+  }
 };
 
 module.exports = nextConfig;

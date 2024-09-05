@@ -4,149 +4,60 @@ import Image from 'next/image';
 // import BetStatus from '@/app/ui/bets/status';
 import { formatDateToLocal, formatDateToLocalWithTime, formatDateToLocalWithTimeAndCoordinates } from '@/app/lib/utils';
 
-import Link from 'next/link'
+// import Link from 'next/link';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
+import Button from '@mui/material/Button';
 
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableColumn,
-  TableRow,
-  TableCell
-} from "@nextui-org/react";
+function createData(name: string, calories: number, fat: number, carbs: number, protein: number) {
+  return { name, calories, fat, carbs, protein };
+}
 
-export default function BetsTable({
-  query,
-  currentPage,
-  bets
-}: {
-  query: string;
-  currentPage: number;
-  bets: any
-}) {
+const rows = [
+  createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
+  createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
+  createData('Eclair', 262, 16.0, 24, 6.0),
+  createData('Cupcake', 305, 3.7, 67, 4.3),
+  createData('Gingerbread', 356, 16.0, 49, 3.9)
+];
 
+export default function BetsTable({ query, currentPage, bets }: { query: string; currentPage: number; bets: any }) {
   return (
-    <div className="mt-6 flow-root">
-      <div className="inline-block min-w-full align-middle">
-        <div className="rounded-lg bg-gray-50 p-2 md:pt-0">
-          <div className="md:hidden">
-            {bets?.map((bet) => (
-              <div
-                key={bet.id}
-                className="mb-2 w-full rounded-md bg-white p-4"
-              >
-                {/* <div className="flex items-center justify-between border-b pb-4">
-                  <div>
-                    <div className="mb-2 flex items-center">
-                      <Image
-                        src={bet.image_url}
-                        className="mr-2 rounded-full"
-                        width={28}
-                        height={28}
-                        alt={`${bet.name}'s profile picture`}
-                      />
-                      <p>{bet.name}</p>
-                    </div>
-                    <p className="text-sm text-gray-500">{bet.email}</p>
-                  </div>
-                  <BetStatus status={bet.status} />
-                </div> */}
-                <div className="flex w-full items-center justify-between pt-4">
-                  <div>
-                    <p className="text-xl font-medium">
-                      {(bet.amount / 100).toLocaleString("en-US", { style: "currency", currency: "USD"})}
-                    </p>
-                    <p>Expires:</p>
-                    <p>{formatDateToLocalWithTime(bet.expiration_date)}</p>
-                  </div>
-                  {/* <div className="flex justify-end gap-2">
-                    <UpdateBet id={bet.id} />
-                    <DeleteBet id={bet.id} />
-                  </div> */}
-                </div>
-              </div>
+    <section>
+      <TableContainer component={Paper}>
+        <Table sx={{ minWidth: 650 }} aria-label="simple table">
+          <TableHead>
+            <TableRow>
+              <TableCell>Amount</TableCell>
+              <TableCell align="right">Submitted Date</TableCell>
+              <TableCell align="right">Expiration Date</TableCell>
+              <TableCell align="right">Location (latitude, longitude)</TableCell>
+              <TableCell align="right">Status</TableCell>
+              <TableCell align="right">Outcome</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {bets?.map(bet => (
+              <TableRow key={bet.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                <TableCell align="right">
+                  {(bet.amount / 100).toLocaleString('en-US', { style: 'currency', currency: 'USD' })}
+                </TableCell>
+                <TableCell align="right">{formatDateToLocalWithTime(bet.created_time)}</TableCell>
+                <TableCell align="right">{formatDateToLocalWithTime(bet.expiration_date)}</TableCell>
+                <TableCell align="right">{`${bet.location.x}, ${bet.location.y}`}</TableCell>
+                <TableCell align="right">{bet.status}</TableCell>
+                <TableCell align="right">{bet.outcome}</TableCell>
+              </TableRow>
             ))}
-          </div>
-          <table className="hidden min-w-full text-gray-900 md:table">
-            <thead className="rounded-lg text-left text-sm font-normal">
-              <tr>
-                <th scope="col" className="px-3 py-5 font-medium">
-                  Amount
-                </th>
-                <th scope="col" className="px-3 py-5 font-medium">
-                  Submitted Date
-                </th>
-                <th scope="col" className="px-3 py-5 font-medium">
-                  Expiration Date
-                </th>
-                <th scope="col" className="px-3 py-5 font-medium">
-                  Location (latitude, longitude)
-                </th>
-                <th scope="col" className="px-3 py-5 font-medium">
-                  Status
-                </th>
-                <th scope="col" className="px-3 py-5 font-medium">
-                  Outcome
-                </th>
-                <th scope="col" className="relative py-3 pl-6 pr-3">
-                  <span className="sr-only">Edit</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white">
-              {bets?.map((bet) => (
-                <tr
-                  key={bet.id}
-                  className="w-full border-b py-3 text-sm last-of-type:border-none [&:first-child>td:first-child]:rounded-tl-lg [&:first-child>td:last-child]:rounded-tr-lg [&:last-child>td:first-child]:rounded-bl-lg [&:last-child>td:last-child]:rounded-br-lg"
-                >
-                  {/* <td className="whitespace-nowrap py-3 pl-6 pr-3">
-                    <div className="flex items-center gap-3">
-                      <Image
-                        src={bet.image_url}
-                        className="rounded-full"
-                        width={28}
-                        height={28}
-                        alt={`${bet.name}'s profile picture`}
-                      />
-                      <p>{bet.name}</p>
-                    </div>
-                  </td> */}
-                  <td className="whitespace-nowrap px-3 py-3">
-                    {(bet.amount / 100).toLocaleString("en-US", { style: "currency", currency: "USD"})}
-                  </td>
-                  <td className="whitespace-nowrap px-3 py-3">
-                    {formatDateToLocalWithTime(bet.created_time)}
-                  </td>
-                  <td className="whitespace-nowrap px-3 py-3">
-                    {formatDateToLocalWithTimeAndCoordinates(bet.expiration_date, bet.IANAtimezone)}
-                  </td>
-                  <td className="whitespace-nowrap px-3 py-3">
-                    {`${bet.location.x}, ${bet.location.y}`}
-                  </td>
-                  <td className="whitespace-nowrap px-3 py-3">
-                    {bet.status}
-                    {/* <BetStatus status={bet.status} /> */}
-                  </td>
-                  <td className="whitespace-nowrap px-3 py-3">
-                    {bet.outcome || "-"}
-                    {/* <BetStatus status={bet.outcome} /> */}
-                  </td>
-                  <td className="whitespace-nowrap py-3 pl-6 pr-3">
-                    <div className="flex justify-end gap-3">
-                      {/* <UpdateBet id={bet.id} />
-                      <DeleteBet id={bet.id} /> */}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <div className="mt-6 flex justify-left gap-4">
-          <Link href="/dashboard/bets/create" className='flex h-10 items-center rounded-lg bg-blue-500 px-4 text-sm font-medium text-white transition-colors hover:bg-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 active:bg-blue-600 aria-disabled:cursor-not-allowed aria-disabled:opacity-50'
->Create new bet</Link>
-        </div>
-      </div>
-    </div>
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <Button href="/dashboard/bets/create">Create new bet</Button>
+    </section>
   );
 }
