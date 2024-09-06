@@ -216,7 +216,7 @@ export default function Sidenav({ children }) {
                 aria-haspopup="true"
                 aria-expanded={open ? 'true' : undefined}
               >
-                <Avatar sx={{ width: 32, height: 32 }}>M</Avatar>
+                <Avatar alt={user.name} src={user.image} sx={{ width: 32, height: 32 }}></Avatar>
               </IconButton>
             </Tooltip>
           ) : (

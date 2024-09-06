@@ -7,6 +7,8 @@ import * as jose from 'jose';
 import crypto from 'crypto';
 const SESSION_ID_COOKIE_NAME = 'SESSION_ID';
 
+import { pool } from '@/app/lib/postgresConnection';
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   console.log(searchParams.get('code'));
@@ -54,11 +56,55 @@ export async function GET(request: Request) {
       audience: 'C3YRvW2SPqgUMmo6i3t9YMXqeamaFfCH'
     });
     console.log(payload);
+    // will just assume gmail?
+    const email = payload?.email;
+    const name = payload?.name;
+    const picture = payload?.picture; // Need to download picture or something?
+    // check if email is in users table
+    const client = await pool.connect();
+
+    let userId;
+
+    try {
+      await client.query('BEGIN');
+      let text = `SELECT * FROM users WHERE email=$1`;
+      const user = await client.query(text, [email]);
+
+      // console.log(user);
+
+      if (user.rowCount === 0) {
+        // user not found. alert? create them?
+        let addUser = `INSERT INTO users(name, email, image_url) VALUES ($1, $2, $3) ON CONFLICT (id) DO NOTHING RETURNING *;`;
+        const newUser = await client.query(addUser, [name, email, picture ? picture : '/this-is-fine_custom.jpg']);
+        userId = newUser.rows[0].id;
+        // Flag to turn on and off
+        // Also need to create an account entry as a transaction
+
+        const insertAccount = `INSERT INTO accounts(user_id, balance) VALUES ($1, $2) ON CONFLICT (id) DO NOTHING;`;
+        const insertAccountValues = [userId, 100];
+        await client.query(insertAccount, insertAccountValues);
+      } else if (user.rowCount > 1) {
+        // Need to alert the authoriies
+      } else {
+        // We chilling cause user was found.
+        // Return the user id
+        userId = user.rows[0].id;
+      }
+      await client.query('COMMIT');
+    } catch (err) {
+      await client.query('ROLLBACK');
+      console.error(err);
+      throw err;
+    } finally {
+      await client.release();
+    }
+
+    // could check sub value (auth0, google-oauth2)
+
     console.log(protectedHeader);
+    // probably need to do something to verify with header
 
     const sessionId = crypto.randomUUID();
-
-    // TODO: look up user in users table based on email
 
     const redisClient = createClient({
       url: process.env.KV_URL || 'redis://localhost:6379',
@@ -72,7 +118,7 @@ export async function GET(request: Request) {
     await redisClient.connect();
 
     await redisClient.hSet(sessionId, {
-      user_id: '410544b2-4001-4271-9855-fec4b6a6442a',
+      user_id: userId,
       name: payload['name'].toString(),
       email: payload['email'].toString(),
       image: payload['picture'].toString()

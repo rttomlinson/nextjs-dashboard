@@ -35,7 +35,10 @@ const FormSchema = z.object({
       message: 'Longitude must be between (inclusive) -180 degrees and 180 degrees'
     }
   ),
-  amount: z.coerce.number().gt(0, { message: 'Please enter an amount greater than $0.' }),
+  amount: z.coerce
+    .number()
+    .gt(0, { message: 'Please enter an amount greater than $0.' })
+    .lt(10000, { message: 'We do not support amount greater than or equal to $10,000 at this time.' }),
   status: z.enum(['submitted']),
   datetime: z.string(), // datetime must not be in the past for the intended location
   offset: z.coerce
@@ -101,8 +104,8 @@ export async function createBet(previousState: State, formData: FormData) {
   // cannot set a time in the past
   if (utcExpirationDateTime.diff(now) <= 0) {
     return {
-      errors: { datetime: ['Expiration time cannot be in the past.'] },
-      message: 'Expiration time cannot be in the past.'
+      errors: { datetime: ['Please select a time further in the future.'] },
+      message: 'Please select a time further in the future.'
     };
   }
 
