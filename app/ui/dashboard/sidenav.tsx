@@ -73,7 +73,6 @@ export default function Sidenav({ children }) {
   };
 
   const { user, setUser } = React.useContext(AuthContext);
-  console.log(user);
   let loggedIn = user;
 
   const router = useRouter();
@@ -278,35 +277,39 @@ export default function Sidenav({ children }) {
           Logout
         </MenuItem>
       </Menu>
-      <Box component="nav" sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }} aria-label="mailbox folders">
-        {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
-        <Drawer
-          // container={container}
-          variant="temporary"
-          open={mobileOpen}
-          onTransitionEnd={handleDrawerTransitionEnd}
-          onClose={handleDrawerClose}
-          ModalProps={{
-            keepMounted: true // Better open performance on mobile.
-          }}
-          sx={{
-            display: { xs: 'block', sm: 'none' },
-            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth }
-          }}
-        >
-          {drawer()}
-        </Drawer>
-        <Drawer
-          variant="permanent"
-          sx={{
-            display: { xs: 'none', sm: 'block' },
-            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth }
-          }}
-          open
-        >
-          {drawer()}
-        </Drawer>
-      </Box>
+      {loggedIn ? (
+        <Box component="nav" sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }} aria-label="mailbox folders">
+          {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
+          <Drawer
+            // container={container}
+            variant="temporary"
+            open={mobileOpen}
+            onTransitionEnd={handleDrawerTransitionEnd}
+            onClose={handleDrawerClose}
+            ModalProps={{
+              keepMounted: true // Better open performance on mobile.
+            }}
+            sx={{
+              display: { xs: 'block', sm: 'none' },
+              '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth }
+            }}
+          >
+            {drawer()}
+          </Drawer>
+          <Drawer
+            variant="permanent"
+            sx={{
+              display: { xs: 'none', sm: 'block' },
+              '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth }
+            }}
+            open
+          >
+            {drawer()}
+          </Drawer>
+        </Box>
+      ) : (
+        <></>
+      )}
       <Box component="main" sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` } }}>
         <Toolbar />
         {children}
