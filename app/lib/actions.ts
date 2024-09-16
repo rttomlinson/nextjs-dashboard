@@ -59,6 +59,15 @@ export type State = {
   };
   message?: string | null;
 };
+
+export type ClaimDailyRewardsState = {
+  errors?: {
+    system_error?: string[];
+    rewards?: string[];
+  };
+  message?: string | null;
+};
+
 export async function createBet(previousState: State, formData: FormData) {
   // get user id of session
   const cookieStore = cookies();
@@ -236,7 +245,7 @@ export async function login(formData: FormData) {
 //   return previousState; // Because TS is dumb
 // }
 
-export async function claimDailyReward(previousState: State, formData: FormData) {
+export async function claimDailyReward(previousState: ClaimDailyRewardsState, formData: FormData) {
   // get user id of session
   const cookieStore = cookies();
   const sessionId = cookieStore.get('SESSION_ID');
