@@ -2,6 +2,7 @@
 import { login, logout } from '@/app/lib/actions';
 import { useContext } from 'react';
 import AuthContext from '@/stores/authContext';
+import Button from '@mui/material/Button';
 
 export default function Login() {
   const { user, setUser } = useContext(AuthContext);
@@ -14,9 +15,12 @@ export default function Login() {
       {user ? (
         <pre>{JSON.stringify(session, null, 2)}</pre>
       ) : (
-        <form action={login}>
-          <button type="submit">Login</button>
-        </form>
+        <Button variant="outlined" color="inherit" onClick={() => login(new FormData())}>
+          Login
+        </Button>
+        // <form action={login}>
+        //   <button type="submit">Login</button>
+        // </form>
       )}
     </section>
   );
