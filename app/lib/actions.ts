@@ -328,7 +328,10 @@ export async function claimDailyReward(previousState: ClaimDailyRewardsState, fo
     await client.release();
   }
   revalidatePath('/account');
-  redirect('/account');
+  return {
+    errors: {},
+    message: null
+  };
 }
 
 export async function logout() {
