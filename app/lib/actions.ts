@@ -329,7 +329,6 @@ export async function claimDailyReward(previousState: ClaimDailyRewardsState, fo
   }
   revalidatePath('/account');
   redirect('/account');
-  return previousState; // Because TS is dumb
 }
 
 export async function logout() {
