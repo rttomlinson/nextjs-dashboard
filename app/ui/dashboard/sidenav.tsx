@@ -73,6 +73,7 @@ export default function Sidenav({ children }) {
   };
 
   const { user, setUser } = React.useContext(AuthContext);
+  console.log(user);
   let loggedIn = user;
 
   const router = useRouter();
@@ -264,7 +265,12 @@ export default function Sidenav({ children }) {
         <MenuItem onClick={handleClose}>
           <Avatar /> Profile
         </MenuItem>
-        <MenuItem onClick={handleClose}>
+        <MenuItem
+          onClick={() => {
+            handleClose();
+            router.push('/account');
+          }}
+        >
           <Avatar /> My account
         </MenuItem>
         <Divider />

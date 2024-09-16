@@ -140,3 +140,5 @@ docker run --rm --name some-bets-postgres -e POSTGRES_USER=postgres -e POSTGRES_
 docker build -f Dockerfile.postgres -t bets-postgres .
 
 docker run --rm --hostname my-rabbit --name some-rabbit -p 5672:5672 rabbitmq:3
+
+https://github.com/auth0-samples/auth0-nextjs-samples/tree/main/Sample-01

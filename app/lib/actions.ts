@@ -110,8 +110,34 @@ export async function createBet(previousState: State, formData: FormData) {
   }
 
   const client = await pool.connect();
+
   // convert to UTC
   try {
+    const account = await client.query(
+      `
+        SELECT balance from accounts WHERE user_id=$1;
+        `,
+      [userId]
+    );
+    // check if there is money in the account
+    // There should only be 1 length row and it must have a balance
+    const balance = account.rows[0].balance;
+    if (balance < amountInCents) {
+      return {
+        errors: { amount: ['You do not have enough funds to place this bet right now.'] },
+        message: 'You do not have enough funds to place this bet right now.'
+      };
+    }
+
+    await client.query(
+      `
+        UPDATE accounts
+        SET balance=$1
+        WHERE user_id=$2;
+        `,
+      [balance - amountInCents, userId]
+    );
+
     await client.query(
       `
         INSERT INTO bets (user_id, amount, status, date, expiration_date, location)
@@ -122,7 +148,7 @@ export async function createBet(previousState: State, formData: FormData) {
   } catch (error) {
     console.log(error);
     return {
-      error: error,
+      errors: error,
       message: `Database Error: Failed to Create Bet. ${error.toString()}`
     };
   } finally {
@@ -140,8 +166,6 @@ export async function login(formData: FormData) {
   cookieStore.set('my_special_cookies_code_verifier', codeVerifier, {
     path: '/'
   });
-  // console.log(cookieStore);
-
   const challenge = base64URLEncode(sha256(codeVerifier));
 
   // Generate a code_challenge from the code_verifier that will be sent to Auth0 to request an authorization_code.
@@ -170,6 +194,133 @@ export async function login(formData: FormData) {
     `&state=${state}`;
   // redirect(`https://${yourDomain}/authorize`)
   redirect(url);
+}
+
+// export async function addMoneyToAccount(previousState: State, formData: FormData) {
+//   // get user id of session
+//   const cookieStore = cookies();
+//   const sessionId = cookieStore.get('SESSION_ID');
+//   if (!(sessionId && sessionId.value != '')) {
+//     redirect('/');
+//   }
+//   // can this user make this kind of bet?
+//   const userId = await getUserIdFromSessionId(sessionId.value); // Get user id from the request (How does this get passed to server side components)
+
+//   console.log('aww yee adding money');
+
+//   // Check when they last added money
+
+//   // Go ahead and add more money
+//   const fiveHundredUSD = 500;
+//   const client = await pool.connect();
+//   try {
+//     await client.query(
+//       `
+//         UPDATE accounts
+//         SET balance = balance + $1
+//         WHERE user_id=$2;
+//         `,
+//       [fiveHundredUSD * 100, userId]
+//     );
+//   } catch (error) {
+//     console.log(error);
+//     return {
+//       errors: error,
+//       message: `Database Error: Failed to Create Bet. ${error.toString()}`
+//     };
+//   } finally {
+//     await client.release();
+//   }
+//   revalidatePath('/account');
+//   redirect('/account');
+//   return previousState; // Because TS is dumb
+// }
+
+export async function claimDailyReward(previousState: State, formData: FormData) {
+  // get user id of session
+  const cookieStore = cookies();
+  const sessionId = cookieStore.get('SESSION_ID');
+  if (!(sessionId && sessionId.value != '')) {
+    redirect('/');
+  }
+  // can this user make this kind of bet?
+  const userId = await getUserIdFromSessionId(sessionId.value); // Get user id from the request (How does this get passed to server side components)
+
+  console.log('aww yee trying to add money');
+
+  const currentTimeUTC = dayjs.utc();
+  const startOfDay = dayjs.utc().startOf('day');
+
+  const fiveHundredUSD = 500;
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    // Check when they last added money - is it within the 24 hour period of utc?
+    const data = await client.query(
+      `
+      SELECT time_of_last_claimed_reward from dailys WHERE user_id=$1;
+      `,
+      [userId]
+    );
+    if (data.rowCount != 1) {
+      //TODO:
+      // Log an Administrative error
+      //throw new Error('Your account does not have a dailys record. Please contact an Administrator.');
+      console.error('Your account does not have a dailys record. Please contact an Administrator.');
+      return {
+        errors: { system_error: ['Your account does not have a dailys record. Please contact an Administrator.'] },
+        message: `'Your account does not have a dailys record. Please contact an Administrator.'`
+      };
+    }
+    const lastReward = dayjs(data.rows[0].time_of_last_claimed_reward).utc();
+
+    if (lastReward.diff(startOfDay) >= 0) {
+      // positive means the reward was claimed after the start of the current day
+      // This catches the edge-case that the lastReward was right at the startOfDay
+      // reward has already been claimed
+      await client.query('COMMIT');
+
+      return {
+        errors: { rewards: ['Daily reward has already been claimed.'] },
+        message: `Daily reward has already been claimed.`
+      };
+    } else {
+      // update the time_of_last_claimed_reward to now()
+
+      await client.query(
+        `
+        UPDATE dailys
+        SET time_of_last_claimed_reward = (timezone('utc', now()))
+        WHERE user_id=$1;
+        `,
+        [userId]
+      );
+
+      // Go ahead and add more money
+
+      await client.query(
+        `
+        UPDATE accounts
+        SET balance = balance + $1
+        WHERE user_id=$2;
+        `,
+        [fiveHundredUSD * 100, userId]
+      );
+      await client.query('COMMIT');
+    }
+  } catch (error) {
+    console.log(error);
+    await client.query('ROLLBACK');
+    return {
+      errors: { system_error: ['Database error'] },
+      message: `Database Error: Failed to claim daily reward. ${error.toString()}`
+    };
+  } finally {
+    await client.release();
+  }
+  revalidatePath('/account');
+  redirect('/account');
+  return previousState; // Because TS is dumb
 }
 
 export async function logout() {
@@ -207,13 +358,7 @@ export async function getUserIdFromSessionId(sessionId: string) {
   redisClient.on('error', err => console.log('Redis Client Error', err));
   await redisClient.connect();
   const value = await redisClient.hGetAll(sessionId);
-  // const userId = value['user_id'];
-  // console.log(`user_id: ${userId}`);
   await redisClient.quit();
-  // if sessionId is not found, then an empty object is returned
-  // if (Object.keys(value) == 0) {
-  //   return null;
-  // }
   if (!value['user_id']) {
     return null;
   }

@@ -12,16 +12,20 @@
     "test:watch": "jest --coverage --watch",
     "test:integration": "start-server-and-test start http-get://localhost:3000 cypress:run",
     "test:integration:watch": "start-server-and-test start http-get://localhost:3000 cypress:open",
+    "test-debug": "node --inspect tests/test.js",
     "cypress:run": "cypress run --browser chrome",
     "cypress:open": "cypress open --browser chrome",
     "seed": "node -r dotenv/config ./scripts/seed.js",
     "drop": "node -r dotenv/config ./scripts/drop.js",
     "testseed": "node -r dotenv/config ./scripts/test-seed.ts",
     "testdrop": "node -r dotenv/config ./scripts/test-drop.ts",
-    "local-test": "jest tests/test.js"
+    "local-test": "jest tests/test.js",
+    "local-test:watch": "jest tests/test.js --watch"
   },
   "dependencies": {
     "@auth0/nextjs-auth0": "^3.5.0",
+    "@babel/preset-env": "^7.25.4",
+    "@babel/preset-typescript": "^7.24.7",
     "@emotion/cache": "^11.13.1",
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
@@ -72,9 +76,9 @@
   },
   "devDependencies": {
     "@babel/core": "^7.23.0",
-    "@testing-library/dom": "^9.0.1",
-    "@testing-library/jest-dom": "^5.16.5",
-    "@testing-library/react": "^14.1.0",
+    "@testing-library/dom": "^9.3.4",
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^14.3.1",
     "@types/jest": "^29.5.12",
     "@types/react": "^18.3.3",
     "@types/react-dom": "18.2.14",
@@ -86,6 +90,7 @@
     "prettier": "^3.1.0",
     "start-server-and-test": "^2.0.0",
     "ts-jest": "^29.1.4",
+    "ts-node": "^10.9.2",
     "typescript": "^5.4.5"
   }
 }

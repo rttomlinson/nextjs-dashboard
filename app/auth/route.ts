@@ -70,8 +70,7 @@ export async function GET(request: Request) {
       let text = `SELECT * FROM users WHERE email=$1`;
       const user = await client.query(text, [email]);
 
-      // console.log(user);
-
+      // If user is not found in user db
       if (user.rowCount === 0) {
         // user not found. alert? create them?
         let addUser = `INSERT INTO users(name, email, image_url) VALUES ($1, $2, $3) ON CONFLICT (id) DO NOTHING RETURNING *;`;
@@ -79,6 +78,11 @@ export async function GET(request: Request) {
         userId = newUser.rows[0].id;
         // Flag to turn on and off
         // Also need to create an account entry as a transaction
+        let addUserDailys = `INSERT INTO dailys(user_id) VALUES ($1) ON CONFLICT (id) DO NOTHING;`;
+        const insertDailyValues = [userId];
+        await client.query(addUserDailys, insertDailyValues);
+
+        // Also create new entry in the dailys table for them
 
         const insertAccount = `INSERT INTO accounts(user_id, balance) VALUES ($1, $2) ON CONFLICT (id) DO NOTHING;`;
         const insertAccountValues = [userId, 100];

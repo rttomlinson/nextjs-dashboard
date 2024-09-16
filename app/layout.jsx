@@ -1,9 +1,7 @@
-import { Container } from 'reactstrap';
 import React from 'react';
 import { AuthContextProvider } from '../stores/authContext';
 
 import { getUser } from '@/app/lib/actions';
-// import HeaderMenu from '@/app/ui/dashboard/header-menu';
 import Sidenav from '@/app/ui/dashboard/sidenav';
 
 export default function RootLayout({ children }) {
@@ -16,6 +14,7 @@ export default function RootLayout({ children }) {
   currentUser = userInfo['currentUser'];
   userProfileImage = currentUser?.image || 'some placeholder images';
   currentUser = currentUser ? currentUser : null;
+  console.log(currentUser);
 
   return (
     <html lang="en">
