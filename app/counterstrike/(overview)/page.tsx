@@ -24,20 +24,18 @@ type Team = {
 
 // Get upcoming matches
 import { createClient } from 'redis';
-const redisUrl = process.env.KV_URL || 'redis://localhost:6379';
-const client = createClient({
-  url: redisUrl,
-  socket: {
-    tls: process.env.KV_USE_TLS ? true : false
-  }
-});
 
 async function getUpcomingSAndATierMatches() {
-  let upcomingmatches;
+  const redisUrl = process.env.KV_URL || 'redis://localhost:6379';
+  const client = createClient({
+    url: redisUrl,
+    socket: {
+      tls: process.env.KV_USE_TLS ? true : false
+    }
+  });
   try {
     await client.connect();
-    upcomingmatches = (await client.json.get('upcomingmatches')) as Match;
-    // if sessionId is not found, then an null object is returned
+    let upcomingmatches = (await client.json.get('upcomingmatches')) as Match;
     return upcomingmatches;
   } catch (err) {
     console.log(err);
@@ -49,6 +47,12 @@ async function getUpcomingSAndATierMatches() {
 
 export default async function Page() {
   let upcomingmatches = await getUpcomingSAndATierMatches();
+  // await new Promise(function (resolve, reject) {
+  //   setTimeout(() => {
+  //     console.log('Delayed for 5 second.');
+  //     resolve(1);
+  //   }, 5000);
+  // });
   console.log(upcomingmatches);
 
   return (

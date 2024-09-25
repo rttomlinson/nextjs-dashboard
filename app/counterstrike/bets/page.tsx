@@ -93,7 +93,7 @@ export default async function Page() {
           // get team from opponents
           const teamThatWasBetOn = bet.opponents.find(team => bet.team_id == team.id);
           return (
-            <div key={bet.id}>
+            <div key={Math.random()}>
               <Stack spacing={4} alignItems="center">
                 <Paper>
                   <div>Tournament name: {bet.tournament_slug}</div>
