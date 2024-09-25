@@ -51,11 +51,6 @@ export default async function Layout({ children }: { children: React.ReactNode }
   await redisClient.connect();
   const value = await redisClient.hGetAll(sessionIdCookie.value);
   await redisClient.quit();
-  // const obj = {
-  //     user_id: '410544b2-4001-4271-9855-fec4b6a6442a',
-  //     name: 'user@user.com',
-  //     email: 'user@user.com'
-  // }
   if (!value['user_id']) {
     redirect('/');
   }

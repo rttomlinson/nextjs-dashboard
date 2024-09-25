@@ -67,15 +67,6 @@ async function getCounterStrikeBetsForUser(userId: string) {
   }
 }
 
-// Get placed matches
-// import { createClient } from 'redis';
-// const redisUrl = process.env.KV_URL || 'redis://localhost:6379';
-// const client = createClient({
-//   url: redisUrl,
-//   socket: {
-//     tls: process.env.KV_USE_TLS ? true : false
-//   }
-// });
 export default async function Page() {
   const cookieStore = cookies();
   const sessionId = cookieStore.get('SESSION_ID');
@@ -101,9 +92,8 @@ export default async function Page() {
         {bets.map(bet => {
           // get team from opponents
           const teamThatWasBetOn = bet.opponents.find(team => bet.team_id == team.id);
-          bet.opponents;
           return (
-            <div>
+            <div key={bet.id}>
               <Stack spacing={4} alignItems="center">
                 <Paper>
                   <div>Tournament name: {bet.tournament_slug}</div>
