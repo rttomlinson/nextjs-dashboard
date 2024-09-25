@@ -1,8 +1,9 @@
 // 'use client';
 import { Metadata } from 'next';
-import Stack from '@mui/material/Stack';
-import Paper from '@mui/material/Paper';
-import Form from '@/app/ui/counterstrike/place-bet';
+// import Stack from '@mui/material/Stack';
+// import Paper from '@mui/material/Paper';
+// import Form from '@/app/ui/counterstrike/place-bet';
+import UpcomingMatchesTable from '@/app/ui/counterstrike/place-bets-area';
 import { unstable_noStore as noStore } from 'next/cache';
 
 export const metadata: Metadata = {
@@ -36,8 +37,8 @@ async function getUpcomingSAndATierMatches() {
   });
   try {
     await client.connect();
-    let upcomingmatches = (await client.json.get('upcomingmatches')) as Match;
-    return upcomingmatches;
+    let upcomingMatches = (await client.json.get('upcomingmatches')) as Match;
+    return upcomingMatches;
   } catch (err) {
     console.log(err);
     throw err;
@@ -47,53 +48,22 @@ async function getUpcomingSAndATierMatches() {
 }
 
 export default async function Page() {
-  let upcomingmatches = await getUpcomingSAndATierMatches();
+  let upcomingMatches = await getUpcomingSAndATierMatches();
   // await new Promise(function (resolve, reject) {
   //   setTimeout(() => {
   //     console.log('Delayed for 5 second.');
   //     resolve(1);
   //   }, 5000);
   // });
-  console.log(upcomingmatches);
+  console.log(upcomingMatches);
+  const upcomingMatchesCount = Object.keys(upcomingMatches);
   noStore();
 
   return (
     <main>
       <h1 className={`mb-4 text-x1 md:text-2x1`}>Upcoming CounterStrike Matches</h1>
-      {upcomingmatches ? <></> : <p>No upcoming matches</p>}
-      <Stack spacing={3}>
-        {Object.keys(upcomingmatches)?.map(matchId => {
-          const match: Match = upcomingmatches[matchId];
-          return (
-            <div key={matchId}>
-              <Stack spacing={4} alignItems="center">
-                <Paper>
-                  <div>Tournament name: {match.tournament_slug}</div>
-                  <div>Scheduled at: {match.scheduled_at}</div>
-                  <Stack direction="row" justifyContent="center" alignItems="center" spacing={4}>
-                    <Stack alignItems="center">
-                      {match.opponents[0].acronym}
-                      <Paper>
-                        <img src={match.opponents[0].image_url} style={{ height: '50px' }}></img>
-                      </Paper>
-                    </Stack>
-                    <div>VS</div>
-                    <Stack alignItems="center">
-                      {match.opponents[1].acronym}
-                      <Paper>
-                        <img src={match.opponents[1].image_url} style={{ height: '50px' }}></img>
-                      </Paper>
-                    </Stack>
-                  </Stack>
-                  <Stack>
-                    <Form matchId={matchId} team1Id={match.opponents[0].id} team2Id={match.opponents[1].id}></Form>
-                  </Stack>
-                </Paper>
-              </Stack>
-            </div>
-          );
-        })}
-      </Stack>
+      {upcomingMatchesCount.length ? <></> : <p>No upcoming matches</p>}
+      <UpcomingMatchesTable upcomingMatches={upcomingMatches}></UpcomingMatchesTable>
     </main>
   );
 }
