@@ -37,7 +37,7 @@ async function getUpcomingSAndATierMatches() {
   });
   try {
     await client.connect();
-    let upcomingMatches = (await client.json.get('upcomingmatches')) as Match;
+    let upcomingMatches = (await client.json.get('upcomingmatches')) as { [key: string]: Match };
     return upcomingMatches;
   } catch (err) {
     console.log(err);

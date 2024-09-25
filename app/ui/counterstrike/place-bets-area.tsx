@@ -1,3 +1,4 @@
+'use client';
 import Stack from '@mui/material/Stack';
 import Paper from '@mui/material/Paper';
 import Form from '@/app/ui/counterstrike/place-bet';
