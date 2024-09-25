@@ -3,12 +3,13 @@ import { Metadata } from 'next';
 import Stack from '@mui/material/Stack';
 import Paper from '@mui/material/Paper';
 import Form from '@/app/ui/counterstrike/place-bet';
+// import { unstable_noStore as noStore } from 'next/cache';
 
 export const metadata: Metadata = {
   title: 'CounterStrike'
 };
 
-type Match = {
+export type Match = {
   id: string;
   tournament_id: string;
   tournament_slug: string;
@@ -16,7 +17,7 @@ type Match = {
   opponents: Team[];
 };
 
-type Team = {
+export type Team = {
   id: string;
   acronym: string;
   image_url: string;
@@ -54,6 +55,7 @@ export default async function Page() {
   //   }, 5000);
   // });
   console.log(upcomingmatches);
+  // noStore();
 
   return (
     <main>
