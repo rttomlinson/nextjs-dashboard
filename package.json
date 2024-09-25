@@ -43,6 +43,7 @@
     "@vercel/postgres": "^0.5.1",
     "@vis.gl/react-google-maps": "^1.1.0",
     "autoprefixer": "10.4.15",
+    "axios": "^1.7.7",
     "bcrypt": "^5.1.1",
     "bootstrap": "^5.3.3",
     "clsx": "^2.0.0",

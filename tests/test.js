@@ -1,5 +1,6 @@
 import pg from 'pg';
 import dayjs from 'dayjs';
+import axios from 'axios';
 var utc = require('dayjs/plugin/utc');
 dayjs.extend(utc);
 
@@ -48,39 +49,9 @@ test('is just testing something', async () => {
     const currentTime = dayjs.utc();
     const startOfDay = dayjs.utc().startOf('day');
     // get the start of the day
-
-    await client.connect();
-
-    const lastDailyRewardClaim = 1; //Need this from db - Time with timezone and should be in UTC
-
-    const userId = 'aaaabcb2-4001-4271-9855-fec4b6aaaaaa';
-    const data = await client.query(
-      `
-      SELECT time_of_last_claimed_reward from dailys WHERE user_id=$1;
-      `,
-      [userId]
-    );
-
-    // Will need to parse it with dayjs.utc();
-
-    // If the user is requesting the daily reward after the start of the day
-    // why do we need to check this?
-
-    // If the last time a user claimed a reward was at or after the start of the day, we deny the claim
-    if (lastDailyRewardClaim >= startOfDay) {
-    } else {
-      // otherwise we can grant the user the reward, and update the lastDailyRewardClaim to the currentTime
-    }
-    console.log(data.rows[0].time_of_last_claimed_reward);
-
-    const lastReward = dayjs(data.rows[0].time_of_last_claimed_reward).utc();
-
-    // if this value is "before" the beginning of the day, then we give the reward.
-    if (dayjs(data.rows[0].time_of_last_claimed_reward).utc().isBefore(startOfDay)) {
-      // update the time_of_last_claimed_reward to now()
-    } else {
-      // reward has already been claimed
-    }
+    const response = axios.get('https://api.pandascore.co/csgo/matches/upcoming?sort=scheduled_at', {
+      headers: { Authorization: 'Bearer A1Nb8RYRdkN5TWaPTuxFmrY0f_Ya0FiI2-IZ_CDG0XIM_IKb3PE' }
+    });
     console.log();
     // throw error if rowCount is not 1
   } catch (err) {

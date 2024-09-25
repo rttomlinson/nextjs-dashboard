@@ -3,9 +3,11 @@ import { Metadata } from 'next';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import Paper from '@mui/material/Paper';
+import Box from '@mui/material/Box';
+import Form from '@/app/ui/counterstrike/place-bet';
 
 export const metadata: Metadata = {
-  title: 'Banana'
+  title: 'CounterStrike'
 };
 
 type Match = {
@@ -43,14 +45,15 @@ export default async function Page() {
   } finally {
     await client.quit();
   }
+  console.log(upcomingmatches);
 
   return (
     <main>
-      <h1 className={`mb-4 text-x1 md:text-2x1`}>Banana</h1>
+      <h1 className={`mb-4 text-x1 md:text-2x1`}>Upcoming CounterStrike Matches</h1>
       {upcomingmatches ? <></> : <p>No upcoming matches</p>}
       <Stack spacing={3}>
-        {Object.keys(upcomingmatches).map(match_id => {
-          const match = upcomingmatches[match_id];
+        {Object.keys(upcomingmatches).map(matchId => {
+          const match = upcomingmatches[matchId];
           return (
             <div>
               <Stack spacing={4} alignItems="center">
@@ -72,8 +75,8 @@ export default async function Page() {
                       </Paper>
                     </Stack>
                   </Stack>
-                  <Stack useFlexGap>
-                    <Button variant="contained">Bet on this match</Button>
+                  <Stack>
+                    <Form matchId={matchId} team1Id={match.opponents[0].id} team2Id={match.opponents[1].id}></Form>
                   </Stack>
                 </Paper>
               </Stack>

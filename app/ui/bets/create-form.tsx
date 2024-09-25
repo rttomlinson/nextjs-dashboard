@@ -394,7 +394,7 @@ export default function Form() {
           </Box>
         </Box>
       ) : betType == 'Outcome' ? (
-        <div>Outcome bet type is currently not supported</div>
+        <div>Simple two-option outcome betting. Submit a bet type with a timeout.</div>
       ) : (
         <div>Not sure what kind of bet this is</div>
       )}

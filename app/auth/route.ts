@@ -77,13 +77,12 @@ export async function GET(request: Request) {
         const newUser = await client.query(addUser, [name, email, picture ? picture : '/this-is-fine_custom.jpg']);
         userId = newUser.rows[0].id;
         // Flag to turn on and off
-        // Also need to create an account entry as a transaction
+        // Also create new entry in the dailys table for them
         let addUserDailys = `INSERT INTO dailys(user_id) VALUES ($1) ON CONFLICT (id) DO NOTHING;`;
         const insertDailyValues = [userId];
         await client.query(addUserDailys, insertDailyValues);
 
-        // Also create new entry in the dailys table for them
-
+        // Also need to create an account entry as a transaction
         const insertAccount = `INSERT INTO accounts(user_id, balance) VALUES ($1, $2) ON CONFLICT (id) DO NOTHING;`;
         const insertAccountValues = [userId, 100];
         await client.query(insertAccount, insertAccountValues);

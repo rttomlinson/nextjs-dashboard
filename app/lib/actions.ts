@@ -60,14 +60,6 @@ export type State = {
   message?: string | null;
 };
 
-export type ClaimDailyRewardsState = {
-  errors?: {
-    system_error?: string[];
-    rewards?: string[];
-  };
-  message?: string | null;
-};
-
 export async function createBet(previousState: State, formData: FormData) {
   // get user id of session
   const cookieStore = cookies();
@@ -122,6 +114,7 @@ export async function createBet(previousState: State, formData: FormData) {
 
   // convert to UTC
   try {
+    await client.query('BEGIN');
     const account = await client.query(
       `
         SELECT balance from accounts WHERE user_id=$1;
@@ -154,8 +147,10 @@ export async function createBet(previousState: State, formData: FormData) {
         `,
       [userId, amountInCents, 'submitted', now.toISOString(), utcExpirationDateTime.toISOString(), latitude, longitude]
     );
+    await client.query('COMMIT');
   } catch (error) {
     console.log(error);
+    await client.query('ROLLBACK');
     return {
       errors: error,
       message: `Database Error: Failed to Create Bet. ${error.toString()}`
@@ -168,83 +163,150 @@ export async function createBet(previousState: State, formData: FormData) {
   redirect('/dashboard/bets');
 }
 
-export async function login(formData: FormData) {
-  const codeVerifier = base64URLEncode(crypto.randomBytes(32));
+export type CounterStrikeBetState = {
+  errors?: {
+    amount?: string[];
+  };
+  message?: string | null;
+};
+type Match = {
+  id: string;
+  tournament_id: string;
+  tournament_slug: string;
+  scheduled_at: string;
+  opponents: Team[];
+};
+
+type Team = {
+  id: string;
+  acronym: string;
+  image_url: string;
+};
+export async function placeCounterStrikeBet(previousState: CounterStrikeBetState, formData: FormData) {
+  // get user id of session
+  console.log(formData.get('matchId'));
+  console.log(formData.get('teamId'));
 
   const cookieStore = cookies();
-  cookieStore.set('my_special_cookies_code_verifier', codeVerifier, {
-    path: '/'
-  });
-  const challenge = base64URLEncode(sha256(codeVerifier));
+  const sessionId = cookieStore.get('SESSION_ID');
+  if (!(sessionId && sessionId.value != '')) {
+    redirect('/');
+  }
 
-  // Generate a code_challenge from the code_verifier that will be sent to Auth0 to request an authorization_code.
-  // const challenge = Buffer.from(ap + "hellozzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz").toString('base64');
-  console.log(`code challenge: ${challenge}`);
+  const matchId = formData.get('matchId');
+  const teamId = formData.get('teamId');
+  // can this user make this kind of bet?
+  const userId = await getUserIdFromSessionId(sessionId.value);
 
-  const codeChallenge = challenge;
-  // 'code_challenge' must be between 43 and 128 characters long
-  // code_challenge' must only contain unreserved characters
-  const yourDomain = 'dev-6zbkrgtguww4sp3s.us.auth0.com';
-  const yourClientId = 'C3YRvW2SPqgUMmo6i3t9YMXqeamaFfCH';
-  const yourCallbackUrl = process.env.BASE_URL ? `${process.env.BASE_URL}/auth` : 'http://localhost:3000/auth';
-  const apiAudience = 'https://dev-6zbkrgtguww4sp3s.us.auth0.com/api/v2/';
-  // how to generate state?
-  const state = 'myspecialstate';
-  const scopes = 'openid profile email offline_access';
+  // Get matchInfo from "cache" (Need to consider how to make this a little better)
+  let upcomingmatch;
+  try {
+    await client.connect();
+    // If this value is null then something is wrong
+    upcomingmatch = (await client.json.get('upcomingmatches', {
+      path: `.${matchId}`
+    })) as Match;
+    // if sessionId is not found, then an null object is returned
+  } catch (err) {
+    console.log(err);
+    throw err;
+  } finally {
+    await client.quit();
+  }
 
-  let url =
-    `https://${yourDomain}/authorize?response_type=code` +
-    `&code_challenge=${codeChallenge}` +
-    `&code_challenge_method=S256` +
-    `&client_id=${yourClientId}` +
-    `&redirect_uri=${yourCallbackUrl}` +
-    `&scope=${scopes}` +
-    `&audience=${apiAudience}` +
-    `&state=${state}`;
-  // redirect(`https://${yourDomain}/authorize`)
-  redirect(url);
+  // check if they have $500, else return an error
+
+  // can they make another?
+
+  // form validation
+
+  // is the team on of the competitors?
+
+  // make sure match hasn't started
+
+  const postgresClient = await pool.connect();
+  try {
+    await postgresClient.query('BEGIN');
+    const account = await postgresClient.query(
+      `
+        SELECT balance from accounts WHERE user_id=$1;
+        `,
+      [userId]
+    );
+    // Hard-code $500 USD bet size
+    // 50000 cents
+    const betAmount = 500;
+    const betAmountInCents = 500 * 100;
+    const balance = account.rows[0].balance;
+    const now = dayjs.utc();
+    if (balance < betAmount * 100) {
+      await postgresClient.query('COMMIT');
+      return {
+        errors: {
+          amount: [
+            `You tried to place a bet for $${betAmount}, but you do not have enough funds to place this bet right now.`
+          ]
+        },
+        message: 'You do not have enough funds to place this bet right now.'
+      };
+    }
+    await postgresClient.query(
+      `
+        UPDATE accounts
+        SET balance=$1
+        WHERE user_id=$2;
+        `,
+      [balance - betAmountInCents, userId]
+    );
+
+    await postgresClient.query(
+      `
+        INSERT INTO counterstrike_bets (user_id, amount, status, team_id, match_id, date)
+        VALUES           ($1, $2, $3, $4, $5, $6);
+        `,
+      [userId, betAmountInCents, 'submitted', teamId, matchId, now.toISOString()]
+    );
+    console.log(upcomingmatch.opponents);
+
+    await postgresClient.query(
+      `
+        INSERT INTO counterstrike_matches(match_id, tournament_id, tournament_slug, scheduled_at, opponents, status)
+        VALUES           ($1, $2, $3, $4, $5, $6) ON CONFLICT (match_id) DO NOTHING;
+        `,
+      [
+        matchId,
+        upcomingmatch.tournament_id,
+        upcomingmatch.tournament_slug,
+        upcomingmatch.scheduled_at,
+        JSON.stringify(upcomingmatch.opponents),
+        'not_started'
+      ]
+    );
+    await postgresClient.query('COMMIT');
+  } catch (error) {
+    console.log(error);
+    await postgresClient.query('ROLLBACK');
+    return {
+      errors: error,
+      message: `Database Error: Failed to Create Bet. ${error.toString()}`
+    };
+  } finally {
+    await postgresClient.release();
+  }
+  // Maybe return that bet was successful
+  return {
+    errors: {},
+    message: 'Bet successfully placed'
+  };
 }
 
-// export async function addMoneyToAccount(previousState: State, formData: FormData) {
-//   // get user id of session
-//   const cookieStore = cookies();
-//   const sessionId = cookieStore.get('SESSION_ID');
-//   if (!(sessionId && sessionId.value != '')) {
-//     redirect('/');
-//   }
-//   // can this user make this kind of bet?
-//   const userId = await getUserIdFromSessionId(sessionId.value); // Get user id from the request (How does this get passed to server side components)
-
-//   console.log('aww yee adding money');
-
-//   // Check when they last added money
-
-//   // Go ahead and add more money
-//   const fiveHundredUSD = 500;
-//   const client = await pool.connect();
-//   try {
-//     await client.query(
-//       `
-//         UPDATE accounts
-//         SET balance = balance + $1
-//         WHERE user_id=$2;
-//         `,
-//       [fiveHundredUSD * 100, userId]
-//     );
-//   } catch (error) {
-//     console.log(error);
-//     return {
-//       errors: error,
-//       message: `Database Error: Failed to Create Bet. ${error.toString()}`
-//     };
-//   } finally {
-//     await client.release();
-//   }
-//   revalidatePath('/account');
-//   redirect('/account');
-//   return previousState; // Because TS is dumb
-// }
-
+export type ClaimDailyRewardsState = {
+  errors?: {
+    system_error?: string[];
+    rewards?: string[];
+  };
+  message?: string | null;
+};
 export async function claimDailyReward(previousState: ClaimDailyRewardsState, formData: FormData) {
   // get user id of session
   const cookieStore = cookies();
@@ -253,7 +315,7 @@ export async function claimDailyReward(previousState: ClaimDailyRewardsState, fo
     redirect('/');
   }
   // can this user make this kind of bet?
-  const userId = await getUserIdFromSessionId(sessionId.value); // Get user id from the request (How does this get passed to server side components)
+  const userId = await getUserIdFromSessionId(sessionId.value);
 
   console.log('aww yee trying to add money');
 
@@ -332,6 +394,43 @@ export async function claimDailyReward(previousState: ClaimDailyRewardsState, fo
     errors: {},
     message: null
   };
+}
+
+export async function login(formData: FormData) {
+  const codeVerifier = base64URLEncode(crypto.randomBytes(32));
+
+  const cookieStore = cookies();
+  cookieStore.set('my_special_cookies_code_verifier', codeVerifier, {
+    path: '/'
+  });
+  const challenge = base64URLEncode(sha256(codeVerifier));
+
+  // Generate a code_challenge from the code_verifier that will be sent to Auth0 to request an authorization_code.
+  // const challenge = Buffer.from(ap + "hellozzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz").toString('base64');
+  console.log(`code challenge: ${challenge}`);
+
+  const codeChallenge = challenge;
+  // 'code_challenge' must be between 43 and 128 characters long
+  // code_challenge' must only contain unreserved characters
+  const yourDomain = 'dev-6zbkrgtguww4sp3s.us.auth0.com';
+  const yourClientId = 'C3YRvW2SPqgUMmo6i3t9YMXqeamaFfCH';
+  const yourCallbackUrl = process.env.BASE_URL ? `${process.env.BASE_URL}/auth` : 'http://localhost:3000/auth';
+  const apiAudience = 'https://dev-6zbkrgtguww4sp3s.us.auth0.com/api/v2/';
+  // how to generate state?
+  const state = 'myspecialstate';
+  const scopes = 'openid profile email offline_access';
+
+  let url =
+    `https://${yourDomain}/authorize?response_type=code` +
+    `&code_challenge=${codeChallenge}` +
+    `&code_challenge_method=S256` +
+    `&client_id=${yourClientId}` +
+    `&redirect_uri=${yourCallbackUrl}` +
+    `&scope=${scopes}` +
+    `&audience=${apiAudience}` +
+    `&state=${state}`;
+  // redirect(`https://${yourDomain}/authorize`)
+  redirect(url);
 }
 
 export async function logout() {
