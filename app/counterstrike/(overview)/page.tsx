@@ -31,18 +31,24 @@ const client = createClient({
     tls: process.env.KV_USE_TLS ? true : false
   }
 });
-export default async function Page() {
+
+async function getUpcomingSAndATierMatches() {
   let upcomingmatches;
   try {
     await client.connect();
     upcomingmatches = (await client.json.get('upcomingmatches')) as Match;
     // if sessionId is not found, then an null object is returned
+    return upcomingmatches;
   } catch (err) {
     console.log(err);
     throw err;
   } finally {
     await client.quit();
   }
+}
+
+export default async function Page() {
+  let upcomingmatches = await getUpcomingSAndATierMatches();
   console.log(upcomingmatches);
 
   return (

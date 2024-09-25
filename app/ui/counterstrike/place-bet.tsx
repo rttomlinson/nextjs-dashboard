@@ -6,9 +6,7 @@ import { placeCounterStrikeBet } from '@/app/lib/actions';
 
 import Alert from '@mui/material/Alert';
 import CheckIcon from '@mui/icons-material/Check';
-
 import React from 'react';
-
 import Button from '@mui/material/Button';
 
 export default function Form(props: { matchId: string; team1Id: string; team2Id: string }) {
