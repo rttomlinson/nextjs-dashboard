@@ -3,7 +3,7 @@ import { Metadata } from 'next';
 import Stack from '@mui/material/Stack';
 import Paper from '@mui/material/Paper';
 import Form from '@/app/ui/counterstrike/place-bet';
-// import { unstable_noStore as noStore } from 'next/cache';
+import { unstable_noStore as noStore } from 'next/cache';
 
 export const metadata: Metadata = {
   title: 'CounterStrike'
@@ -55,15 +55,15 @@ export default async function Page() {
   //   }, 5000);
   // });
   console.log(upcomingmatches);
-  // noStore();
+  noStore();
 
   return (
     <main>
       <h1 className={`mb-4 text-x1 md:text-2x1`}>Upcoming CounterStrike Matches</h1>
       {upcomingmatches ? <></> : <p>No upcoming matches</p>}
       <Stack spacing={3}>
-        {Object.keys(upcomingmatches).map(matchId => {
-          const match = upcomingmatches[matchId];
+        {Object.keys(upcomingmatches)?.map(matchId => {
+          const match: Match = upcomingmatches[matchId];
           return (
             <div key={matchId}>
               <Stack spacing={4} alignItems="center">
