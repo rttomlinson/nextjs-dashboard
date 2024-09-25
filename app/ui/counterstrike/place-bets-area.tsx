@@ -14,7 +14,8 @@ export type Team = {
   acronym: string;
   image_url: string;
 };
-export default function UpcomingMatchesTable({ upcomingMatches }: { upcomingMatches: Match }) {
+export default function UpcomingMatchesTable({ upcomingMatchesJSON }: { upcomingMatchesJSON: string }) {
+  const upcomingMatches = JSON.parse(upcomingMatchesJSON);
   return (
     <Stack spacing={3}>
       {Object.keys(upcomingMatches)?.map(matchId => {

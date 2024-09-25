@@ -63,7 +63,7 @@ export default async function Page() {
     <main>
       <h1 className={`mb-4 text-x1 md:text-2x1`}>Upcoming CounterStrike Matches</h1>
       {upcomingMatchesCount.length ? <></> : <p>No upcoming matches</p>}
-      <UpcomingMatchesTable upcomingMatches={upcomingMatches}></UpcomingMatchesTable>
+      <UpcomingMatchesTable upcomingMatchesJSON={JSON.stringify(upcomingMatches)}></UpcomingMatchesTable>
     </main>
   );
 }
