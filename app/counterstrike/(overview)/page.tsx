@@ -55,7 +55,7 @@ export default async function Page() {
         {Object.keys(upcomingmatches).map(matchId => {
           const match = upcomingmatches[matchId];
           return (
-            <div>
+            <div key={matchId}>
               <Stack spacing={4} alignItems="center">
                 <Paper>
                   <div>Tournament name: {match.tournament_slug}</div>
