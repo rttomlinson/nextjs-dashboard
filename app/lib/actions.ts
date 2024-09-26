@@ -199,13 +199,13 @@ export async function placeCounterStrikeBet(previousState: CounterStrikeBetState
   const userId = await getUserIdFromSessionId(sessionId.value);
 
   // Get matchInfo from "cache" (Need to consider how to make this a little better)
-  let upcomingmatch;
+  let upcomingMatch;
   try {
     await client.connect();
     // If this value is null then something is wrong
-    upcomingmatch = (await client.json.get('upcomingmatches', {
+    upcomingMatch = (await client.json.get('upcomingmatches', {
       path: `.${matchId}`
-    })) as { [key: string]: Match };
+    })) as Match;
     // if sessionId is not found, then an null object is returned
   } catch (err) {
     console.log(err);
@@ -213,6 +213,7 @@ export async function placeCounterStrikeBet(previousState: CounterStrikeBetState
   } finally {
     await client.quit();
   }
+  console.log(upcomingMatch);
 
   // check if they have $500, else return an error
 
@@ -266,7 +267,7 @@ export async function placeCounterStrikeBet(previousState: CounterStrikeBetState
         `,
       [userId, betAmountInCents, 'submitted', teamId, matchId, now.toISOString()]
     );
-    console.log(upcomingmatch.opponents);
+    // console.log(upcomingMatch.opponents);
 
     await postgresClient.query(
       `
@@ -275,10 +276,10 @@ export async function placeCounterStrikeBet(previousState: CounterStrikeBetState
         `,
       [
         matchId,
-        upcomingmatch.tournament_id,
-        upcomingmatch.tournament_slug,
-        upcomingmatch.scheduled_at,
-        JSON.stringify(upcomingmatch.opponents),
+        upcomingMatch.tournament_id,
+        upcomingMatch.tournament_slug,
+        upcomingMatch.scheduled_at,
+        JSON.stringify(upcomingMatch.opponents),
         'not_started'
       ]
     );
