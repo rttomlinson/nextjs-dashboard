@@ -57,7 +57,7 @@ async function getCounterStrikeBetsForUser(userId: string) {
     `,
       [userId]
     );
-    console.log(bets.rows);
+    // console.log(bets.rows);
     return bets.rows;
   } catch (error) {
     console.error('Database Error:', error);
@@ -89,7 +89,7 @@ export default async function Page() {
       <Stack spacing={3}>
         {bets.map(bet => {
           // get team from opponents
-          const teamThatWasBetOn = bet.opponents.find(team => bet.team_id == team.id);
+          const teamThatWasBetOn: Team = bet.opponents.find(team => bet.team_id == team.id);
           return (
             <div key={Math.random()}>
               <Stack spacing={4} alignItems="center">
