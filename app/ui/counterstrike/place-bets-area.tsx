@@ -2,6 +2,7 @@
 import Stack from '@mui/material/Stack';
 import Paper from '@mui/material/Paper';
 import Form from '@/app/ui/counterstrike/place-bet';
+
 export type Match = {
   id: string;
   tournament_id: string;
@@ -15,8 +16,8 @@ export type Team = {
   acronym: string;
   image_url: string;
 };
-export default function UpcomingMatchesTable({ upcomingMatchesJSON }: { upcomingMatchesJSON: string }) {
-  const upcomingMatches = JSON.parse(upcomingMatchesJSON);
+export default function UpcomingMatchesTable({ upcomingMatches }: { upcomingMatches: { [key: string]: Match } }) {
+  // const upcomingMatches = JSON.parse(upcomingMatchesJSON);
   return (
     <Stack spacing={3}>
       {Object.keys(upcomingMatches)?.map(matchId => {

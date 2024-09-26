@@ -80,8 +80,6 @@ export default async function Page() {
   const userId = await getUserIdFromSessionId(sessionId.value);
   const bets = await getCounterStrikeBetsForUser(userId);
 
-  console.log(bets);
-
   // Switch to relational database since upcoming matches also won't exist
 
   return (

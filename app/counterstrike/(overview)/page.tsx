@@ -48,7 +48,7 @@ async function getUpcomingSAndATierMatches() {
 }
 
 export default async function Page() {
-  let upcomingMatches = await getUpcomingSAndATierMatches();
+  let upcomingMatches: { [key: string]: Match } = await getUpcomingSAndATierMatches();
   // await new Promise(function (resolve, reject) {
   //   setTimeout(() => {
   //     console.log('Delayed for 5 second.');
@@ -63,7 +63,7 @@ export default async function Page() {
     <main>
       <h1 className={`mb-4 text-x1 md:text-2x1`}>Upcoming CounterStrike Matches</h1>
       {upcomingMatchesCount.length ? <></> : <p>No upcoming matches</p>}
-      <UpcomingMatchesTable upcomingMatchesJSON={JSON.stringify(upcomingMatches)}></UpcomingMatchesTable>
+      <UpcomingMatchesTable upcomingMatches={upcomingMatches}></UpcomingMatchesTable>
     </main>
   );
 }
