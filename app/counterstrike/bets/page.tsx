@@ -6,6 +6,7 @@ import { redirect } from 'next/navigation';
 import { getUserIdFromSessionId } from '@/app/lib/actions';
 import { pool } from '@/app/lib/postgresConnection';
 import { formatDateToLocalWithTime } from '@/app/lib/utils';
+import ViewCounterStrikeBet from '@/app/ui/counterstrike/view-bet';
 
 export const metadata: Metadata = {
   title: 'Your CounterStrike Bets'
@@ -25,7 +26,20 @@ type Team = {
   image_url: string;
 };
 
-type CounterStrikeBet = {};
+type CounterStrikeBet = {
+  id: string;
+  amount: number;
+  created_time: string;
+  bet_status: string;
+  bet_outcome: string;
+  winner_team_id: string;
+  match_id: string;
+  opponents: Team[];
+  scheduled_at: string;
+  match_status: string;
+  tournament_id: string;
+  tournament_slag: string;
+};
 
 async function getCounterStrikeBetsForUser(userId: string) {
   const client = await pool.connect();
@@ -38,6 +52,7 @@ async function getCounterStrikeBetsForUser(userId: string) {
     const bets = await client.query(
       `
       SELECT
+        counterstrike_bets.id,
         counterstrike_bets.amount,
         counterstrike_bets.date as created_time,
         counterstrike_bets.status as bet_status,
@@ -79,41 +94,32 @@ export default async function Page() {
   }
   const userId = await getUserIdFromSessionId(sessionId.value);
   const bets = await getCounterStrikeBetsForUser(userId);
+  const betsLength = Object.keys(bets).length;
+  console.log(bets);
 
   // Switch to relational database since upcoming matches also won't exist
 
   return (
     <main>
       <h1 className={`mb-4 text-x1 md:text-2x1`}>You bets on CounterStrike Matches</h1>
-      {bets ? <></> : <p>You haven't placed bets on any matches yet</p>}
+      {betsLength ? <></> : <p>You haven't placed bets on any matches yet</p>}
       <Stack spacing={3}>
         {bets.map(bet => {
           // get team from opponents
           const teamThatWasBetOn: Team = bet.opponents.find(team => bet.team_id == team.id);
           return (
-            <div key={Math.random()}>
+            <div key={bet.id}>
               <Stack spacing={4} alignItems="center">
-                <Paper>
-                  <div>Tournament name: {bet.tournament_slug}</div>
-                  <div>Scheduled at: {formatDateToLocalWithTime(bet.scheduled_at)}</div>
-                  <Stack direction="row" justifyContent="center" alignItems="center" spacing={4}>
-                    <Stack alignItems="center">
-                      {bet.opponents[0].acronym}
-                      <Paper>
-                        <img src={bet.opponents[0].image_url} style={{ height: '50px' }}></img>
-                      </Paper>
-                    </Stack>
-                    <div>VS</div>
-                    <Stack alignItems="center">
-                      {bet.opponents[1].acronym}
-                      <Paper>
-                        <img src={bet.opponents[1].image_url} style={{ height: '50px' }}></img>
-                      </Paper>
-                    </Stack>
-                  </Stack>
-                  You bet on {teamThatWasBetOn.acronym} to take the series
-                  <img src={teamThatWasBetOn.image_url} style={{ height: '50px' }}></img>
-                </Paper>
+                <ViewCounterStrikeBet
+                  matchScheduledAt={formatDateToLocalWithTime(bet.scheduled_at).toString()}
+                  tournamentSlug={bet.tournament_slug}
+                  team1Acronym={bet.opponents[0].acronym}
+                  team2Acronym={bet.opponents[1].acronym}
+                  team1ImageUrl={bet.opponents[0].image_url}
+                  team2ImageUrl={bet.opponents[1].image_url}
+                  teamThatWasBetOnAcronym={teamThatWasBetOn.acronym}
+                  teamThatWasBetOnImageUrl={teamThatWasBetOn.image_url}
+                ></ViewCounterStrikeBet>
               </Stack>
             </div>
           );
