@@ -205,7 +205,7 @@ export async function placeCounterStrikeBet(previousState: CounterStrikeBetState
     // If this value is null then something is wrong
     upcomingmatch = (await client.json.get('upcomingmatches', {
       path: `.${matchId}`
-    })) as Match;
+    })) as { [key: string]: Match };
     // if sessionId is not found, then an null object is returned
   } catch (err) {
     console.log(err);
