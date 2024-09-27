@@ -141,45 +141,4 @@ export async function GET(request: Request) {
   console.log('everything looks good');
   let redirectUrl = process.env.BASE_URL ? `${process.env.BASE_URL}/dashboard` : 'http://localhost:3000/dashboard';
   redirect(redirectUrl);
-
-  // need to catch errors here
-
-  // const admin = process.env.BANANA_MONGODB_USERNAME;
-  // const password = process.env.BANANA_MONGODB_PASSWORD;
-  // // Check session
-  // const uri = `mongodb://${admin}:${password}@localhost:27017`;
-  // // const uri = `mongodb://localhost:27017`
-
-  // const client = new MongoClient(uri, {
-  //   serverApi: {
-  //     version: ServerApiVersion.v1,
-  //     strict: true,
-  //     deprecationErrors: true
-  //   }
-  // });
-
-  // async function run() {
-  //   try {
-  //     // Connect the client to the server (optional starting in v4.7)
-  //     await client.connect();
-  //     // Send a ping to confirm a successful connection
-  //     const db = await client.db('admin');
-  //     await db.command({ ping: 1 });
-  //     console.log('Pinged your deployment. You successfully connected to MongoDB!');
-
-  //     const bananaDB = client.db('banana');
-  //     const myColl = bananaDB.collection('session');
-  //     const sessionData = { sessionId: 'abc123' };
-  //     await myColl.insertOne(sessionData);
-  //     const mySessions = await myColl.find();
-
-  //     for await (const doc of mySessions) {
-  //       console.log(doc);
-  //     }
-  //   } finally {
-  //     // Ensures that the client will close when you finish/error
-  //     await client.close();
-  //   }
-  // }
-  // run().catch(console.dir);
 }

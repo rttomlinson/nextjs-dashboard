@@ -25,7 +25,7 @@ describe('/api/shows', () => {
   //     user: 'postgres',
   //     password: 'mysecretpassword',
   //     host: 'localhost',
-  //     database: 'betsapp'
+  //     database: 'postgres'
   //   });
   //   try {
   //     await client.connect();
@@ -55,7 +55,7 @@ describe('/api/shows', () => {
       user: 'postgres',
       password: 'mysecretpassword',
       host: 'localhost',
-      database: 'betsapp'
+      database: 'postgres'
     });
     try {
       await client.connect();

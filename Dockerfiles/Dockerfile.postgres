@@ -11,7 +11,7 @@ FROM postgres:16
 # Prepare ENVs
 # ENV PG_CRON_VERSION           "1.4.2"
 # Set environment variables
-ENV POSTGRES_DB "betsapp"
+ENV POSTGRES_DB "postgres"
 ENV POSTGRES_USER "postgres"
 ENV POSTGRES_PASSWORD "mysecretpassword"
 

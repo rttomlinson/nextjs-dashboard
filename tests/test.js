@@ -43,7 +43,7 @@ test('is just testing something', async () => {
     user: 'postgres',
     password: 'mysecretpassword',
     host: 'localhost',
-    database: 'betsapp'
+    database: 'postgres'
   });
   try {
     const currentTime = dayjs.utc();

@@ -398,6 +398,28 @@ export async function claimDailyReward(previousState: ClaimDailyRewardsState, fo
   };
 }
 
+export async function getUserBalance(userId) {
+  const client = await pool.connect();
+
+  try {
+    const money = await client.query(
+      `
+        SELECT balance
+        FROM accounts
+        WHERE user_id=$1
+        `,
+      [userId]
+    );
+    console.log(money.rows[0]);
+    return money.rows[0].balance;
+  } catch (error) {
+    console.error('Database error. Fetching user money:', error);
+    throw error;
+  } finally {
+    await client.release();
+  }
+}
+
 export async function login(formData: FormData) {
   const codeVerifier = base64URLEncode(crypto.randomBytes(32));
 
@@ -480,6 +502,24 @@ export async function getUserIdFromSessionId(sessionId: string) {
 }
 
 async function getSessionData(sessionId) {
+  const redisClient = client;
+  await redisClient.connect();
+  try {
+    const value = await redisClient.hGetAll(sessionId);
+    // if sessionId is not found, then an null object is returned
+    if (!value['user_id']) {
+      return null;
+    }
+    return value;
+  } catch (err) {
+    console.log(err);
+    throw err;
+  } finally {
+    await client.quit();
+  }
+}
+
+export async function getApplicationUserSessionData(sessionId) {
   const redisClient = client;
   await redisClient.connect();
   try {
