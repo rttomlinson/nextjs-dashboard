@@ -3,7 +3,6 @@ import UserInfo from '@/app/ui/dashboard/userinfo';
 import { getUserBalance, getApplicationUserSessionData } from '@/app/lib/actions';
 import { unstable_noStore } from 'next/cache';
 import { cookies } from 'next/headers';
-// import { createClient } from 'redis';
 import { redirect } from 'next/navigation';
 const SESSION_ID_COOKIE_NAME = 'SESSION_ID';
 

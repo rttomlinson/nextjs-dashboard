@@ -56,9 +56,9 @@ async function getUpcomingCounterStrikeMatches() {
     });
 
     client.on('error', err => console.log('Redis Client Error', err));
-    await client.connect();
+    // await client.connect();
 
-    let upcomingMatches = (await client.json.get('upcomingmatches')) as Match;
+    let upcomingMatches = (await client.json.get(process.env.UPCOMING_MATCHES_KEY)) as Match;
     return upcomingMatches;
   } catch (err) {
     console.log(err);

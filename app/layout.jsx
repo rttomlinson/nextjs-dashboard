@@ -2,7 +2,7 @@ import React from 'react';
 import { AuthContextProvider } from '../stores/authContext';
 
 import { getUser } from '@/app/lib/actions';
-import Sidenav from '@/app/ui/dashboard/sidenav';
+import NavbarAndSidebar from '@/app/ui/dashboard/navbar-and-sidebar';
 
 export default function RootLayout({ children }) {
   console.log('inside RootLayout');
@@ -14,7 +14,6 @@ export default function RootLayout({ children }) {
   currentUser = userInfo['currentUser'];
   userProfileImage = currentUser?.image || 'some placeholder images';
   currentUser = currentUser ? currentUser : null;
-  console.log(currentUser);
 
   return (
     <html lang="en">
@@ -28,9 +27,7 @@ export default function RootLayout({ children }) {
       </head>
       <body>
         <AuthContextProvider currentUser={JSON.stringify(currentUser)}>
-          {/* <HeaderMenu /> */}
-          <Sidenav>{children}</Sidenav>
-          {/* <Container>{children}</Container> */}
+          <NavbarAndSidebar>{children}</NavbarAndSidebar>
         </AuthContextProvider>
       </body>
     </html>

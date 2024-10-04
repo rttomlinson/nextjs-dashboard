@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-// import { createClient } from 'redis';
 const SESSION_ID_COOKIE_NAME = 'SESSION_ID';
 // This function can be marked `async` if using `await` inside
 export async function middleware(request: NextRequest) {

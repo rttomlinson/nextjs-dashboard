@@ -5,6 +5,7 @@ import { Metadata } from 'next';
 // import Form from '@/app/ui/counterstrike/place-bet';
 import UpcomingMatchesTable from '@/app/ui/counterstrike/place-bets-area';
 import { unstable_noStore as noStore } from 'next/cache';
+import { createRedisClient } from '@/app/lib/redisConnection';
 
 export const metadata: Metadata = {
   title: 'CounterStrike'
@@ -25,25 +26,18 @@ export type Team = {
 };
 
 // Get upcoming matches
-import { createClient } from 'redis';
 
 async function getUpcomingSAndATierMatches() {
-  const redisUrl = process.env.KV_URL || 'redis://localhost:6379';
-  const client = createClient({
-    url: redisUrl,
-    socket: {
-      tls: process.env.KV_USE_TLS ? true : false
-    }
-  });
+  const redisClient = await createRedisClient();
   try {
-    await client.connect();
-    let upcomingMatches = (await client.json.get('upcomingmatches')) as { [key: string]: Match };
+    await redisClient.connect();
+    let upcomingMatches = (await redisClient.json.get(process.env.UPCOMING_MATCHES_KEY)) as { [key: string]: Match };
     return upcomingMatches;
   } catch (err) {
     console.log(err);
     throw err;
   } finally {
-    await client.quit();
+    await redisClient.quit();
   }
 }
 

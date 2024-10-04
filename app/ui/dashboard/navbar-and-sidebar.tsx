@@ -61,7 +61,7 @@ let getLocationPromise = (): Promise<GeolocationPosition> => {
 
 const drawerWidth = 240;
 
-export default function Sidenav({ children }) {
+export default function NavbarAndSidebar({ children }) {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [recordStatus, updateRecordStatus] = useState(null);
   const open = Boolean(anchorEl);
@@ -128,12 +128,12 @@ export default function Sidenav({ children }) {
       // Handle response if necessary
       const data = await response.json();
       console.log(data);
+      console.log('location recorded');
       const localNow = dayjs.utc().local().format('L LTS');
       updateRecordStatus({ message: `Location recorded at ${localNow}` });
     } catch (err) {
-      console.log('ERRRRRRRRRRRRRRR');
+      console.error('location was not recorded for some reason');
     }
-    console.log('location recorded');
   };
 
   const drawer = () => {

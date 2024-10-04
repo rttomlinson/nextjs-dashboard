@@ -5,7 +5,6 @@ import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
 import { base64URLEncode, sha256 } from '@/app/lib/utils';
 import crypto from 'crypto';
-import { createClient } from 'redis';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
@@ -14,7 +13,7 @@ dayjs.extend(timezone);
 const { find } = require('geo-tz');
 const SESSION_ID_COOKIE_NAME = 'SESSION_ID';
 import { pool } from '@/app/lib/postgresConnection';
-import { client } from '@/app/lib/redisConnection';
+import { createRedisClient } from '@/app/lib/redisConnection';
 
 // Need to verify that datetime is in the future
 const FormSchema = z.object({
@@ -149,7 +148,7 @@ export async function createBet(previousState: State, formData: FormData) {
     );
     await client.query('COMMIT');
   } catch (error) {
-    console.log(error);
+    console.error(error);
     await client.query('ROLLBACK');
     return {
       errors: error,
@@ -158,7 +157,6 @@ export async function createBet(previousState: State, formData: FormData) {
   } finally {
     await client.release();
   }
-  console.log('created bet');
   revalidatePath('/dashboard/bets');
   redirect('/dashboard/bets');
 }
@@ -184,9 +182,6 @@ type Team = {
 };
 export async function placeCounterStrikeBet(previousState: CounterStrikeBetState, formData: FormData) {
   // get user id of session
-  console.log(formData.get('matchId'));
-  console.log(formData.get('teamId'));
-
   const cookieStore = cookies();
   const sessionId = cookieStore.get('SESSION_ID');
   if (!(sessionId && sessionId.value != '')) {
@@ -200,10 +195,11 @@ export async function placeCounterStrikeBet(previousState: CounterStrikeBetState
 
   // Get matchInfo from "cache" (Need to consider how to make this a little better)
   let upcomingMatch;
+  const client = await createRedisClient();
   try {
     await client.connect();
     // If this value is null then something is wrong
-    upcomingMatch = (await client.json.get('upcomingmatches', {
+    upcomingMatch = (await client.json.get(process.env.UPCOMING_MATCHES_KEY, {
       path: `$.${matchId}`
     })) as Match[];
     // If upcomingMatch length is not equal to 1 then something is wrong
@@ -214,17 +210,6 @@ export async function placeCounterStrikeBet(previousState: CounterStrikeBetState
   } finally {
     await client.quit();
   }
-  console.log(upcomingMatch);
-
-  // check if they have $500, else return an error
-
-  // can they make another?
-
-  // form validation
-
-  // is the team on of the competitors?
-
-  // make sure match hasn't started
 
   const postgresClient = await pool.connect();
   try {
@@ -268,7 +253,6 @@ export async function placeCounterStrikeBet(previousState: CounterStrikeBetState
         `,
       [userId, betAmountInCents, 'submitted', teamId, matchId, now.toISOString()]
     );
-    // console.log(upcomingMatch.opponents);
 
     await postgresClient.query(
       `
@@ -286,7 +270,7 @@ export async function placeCounterStrikeBet(previousState: CounterStrikeBetState
     );
     await postgresClient.query('COMMIT');
   } catch (error) {
-    console.log(error);
+    console.error(error);
     await postgresClient.query('ROLLBACK');
     return {
       errors: error,
@@ -318,8 +302,6 @@ export async function claimDailyReward(previousState: ClaimDailyRewardsState, fo
   }
   // can this user make this kind of bet?
   const userId = await getUserIdFromSessionId(sessionId.value);
-
-  console.log('aww yee trying to add money');
 
   const currentTimeUTC = dayjs.utc();
   const startOfDay = dayjs.utc().startOf('day');
@@ -382,7 +364,7 @@ export async function claimDailyReward(previousState: ClaimDailyRewardsState, fo
       await client.query('COMMIT');
     }
   } catch (error) {
-    console.log(error);
+    console.error(error);
     await client.query('ROLLBACK');
     return {
       errors: { system_error: ['Database error'] },
@@ -410,7 +392,6 @@ export async function getUserBalance(userId) {
         `,
       [userId]
     );
-    console.log(money.rows[0]);
     return money.rows[0].balance;
   } catch (error) {
     console.error('Database error. Fetching user money:', error);
@@ -423,10 +404,12 @@ export async function getUserBalance(userId) {
 export async function login(formData: FormData) {
   const codeVerifier = base64URLEncode(crypto.randomBytes(32));
 
+  // Instead of storing this as a cookie, we should store it in the session data
   const cookieStore = cookies();
   cookieStore.set('my_special_cookies_code_verifier', codeVerifier, {
     path: '/'
   });
+
   const challenge = base64URLEncode(sha256(codeVerifier));
 
   // Generate a code_challenge from the code_verifier that will be sent to Auth0 to request an authorization_code.
@@ -453,7 +436,6 @@ export async function login(formData: FormData) {
     `&scope=${scopes}` +
     `&audience=${apiAudience}` +
     `&state=${state}`;
-  // redirect(`https://${yourDomain}/authorize`)
   redirect(url);
 }
 
@@ -465,46 +447,36 @@ export async function logout() {
   }
 
   cookieStore.delete(SESSION_ID_COOKIE_NAME);
-  const redisClient = createClient({
-    url: process.env.KV_URL || 'redis://localhost:6379',
-    socket: {
-      tls: process.env.KV_USE_TLS ? true : false
-    }
-  });
-
-  redisClient.on('error', err => console.log('Redis Client Error', err));
-
-  await redisClient.connect();
-
-  await redisClient.del(sessionId.value);
-  await redisClient.quit();
-  console.log('logging out');
+  const redisClient = await createRedisClient();
+  try {
+    await redisClient.connect();
+    await redisClient.del(sessionId.value);
+  } finally {
+    await redisClient.quit();
+  }
 }
 
 export async function getUserIdFromSessionId(sessionId: string) {
-  const redisClient = createClient({
-    url: process.env.KV_URL || 'redis://localhost:6379',
-    socket: {
-      tls: process.env.KV_USE_TLS ? true : false
+  const redisClient = await createRedisClient();
+  try {
+    await redisClient.connect();
+
+    const value = await redisClient.hGetAll(sessionId);
+    if (!value['user_id']) {
+      return null;
     }
-  });
 
-  redisClient.on('error', err => console.log('Redis Client Error', err));
-  await redisClient.connect();
-  const value = await redisClient.hGetAll(sessionId);
-  await redisClient.quit();
-  if (!value['user_id']) {
-    return null;
+    return value['user_id'];
+  } finally {
+    await redisClient.quit();
   }
-
-  return value['user_id'];
-  // return userId;
 }
 
 async function getSessionData(sessionId) {
-  const redisClient = client;
-  await redisClient.connect();
+  const redisClient = await createRedisClient();
   try {
+    await redisClient.connect();
+
     const value = await redisClient.hGetAll(sessionId);
     // if sessionId is not found, then an null object is returned
     if (!value['user_id']) {
@@ -512,17 +484,17 @@ async function getSessionData(sessionId) {
     }
     return value;
   } catch (err) {
-    console.log(err);
+    console.error(err);
     throw err;
   } finally {
-    await client.quit();
+    await redisClient.quit();
   }
 }
 
 export async function getApplicationUserSessionData(sessionId) {
-  const redisClient = client;
-  await redisClient.connect();
+  const redisClient = await createRedisClient();
   try {
+    await redisClient.connect();
     const value = await redisClient.hGetAll(sessionId);
     // if sessionId is not found, then an null object is returned
     if (!value['user_id']) {
@@ -530,10 +502,10 @@ export async function getApplicationUserSessionData(sessionId) {
     }
     return value;
   } catch (err) {
-    console.log(err);
+    console.error(err);
     throw err;
   } finally {
-    await client.quit();
+    await redisClient.quit();
   }
 }
 
@@ -554,7 +526,5 @@ export async function getUser() {
 }
 
 export async function recordLocation(formData: FormData) {
-  console.log("i'm server");
-
   const rawFormData = {};
 }

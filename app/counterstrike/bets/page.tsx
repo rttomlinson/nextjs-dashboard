@@ -99,6 +99,18 @@ export default async function Page() {
 
   // Switch to relational database since upcoming matches also won't exist
 
+  // do some sorting
+
+  // pending bets
+
+  // submitted bets
+
+  // completed bets
+
+  // what were the outcomes
+
+  // how much money is tied up in bets?
+
   return (
     <main>
       <h1 className={`mb-4 text-x1 md:text-2x1`}>You bets on CounterStrike Matches</h1>

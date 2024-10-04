@@ -12,6 +12,11 @@ import { pool } from '@/app/lib/postgresConnection';
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   console.log(searchParams.get('code'));
+  // Do we also verify state here?
+  // state is for the server to check
+  // Is it part of the same session?
+  // code verifier is for the auth server to check
+  // is it the same initiator? (can't use cookies here) - but is still a proxy for session
   console.log(searchParams.get('state'));
   console.log('inside /auth path');
   const cookieStore = cookies();
