@@ -109,14 +109,51 @@ export default async function Page() {
 
   // what were the outcomes
 
+  // split on 'settled' outcome versus not
+  const { settledBets, otherBets } = bets.reduce(
+    (acc, bet) => {
+      if (bet.bet_status == 'settled') {
+        acc.settledBets.push(bet);
+      } else {
+        acc.otherBets.push(bet);
+      }
+      return acc;
+    },
+    { settledBets: [], otherBets: [] }
+  );
+
   // how much money is tied up in bets?
 
   return (
     <main>
       <h1 className={`mb-4 text-x1 md:text-2x1`}>You bets on CounterStrike Matches</h1>
       {betsLength ? <></> : <p>You haven't placed bets on any matches yet</p>}
+      <h2 className={`mb-4 text-x1 md:text-2x1`}>Pending bets</h2>
       <Stack spacing={3}>
-        {bets.map(bet => {
+        {otherBets.map(bet => {
+          // get team from opponents
+          const teamThatWasBetOn: Team = bet.opponents.find(team => bet.team_id == team.id);
+          return (
+            <div key={bet.id}>
+              <Stack spacing={4} alignItems="center">
+                <ViewCounterStrikeBet
+                  matchScheduledAt={formatDateToLocalWithTime(bet.scheduled_at).toString()}
+                  tournamentSlug={bet.tournament_slug}
+                  team1Acronym={bet.opponents[0].acronym}
+                  team2Acronym={bet.opponents[1].acronym}
+                  team1ImageUrl={bet.opponents[0].image_url}
+                  team2ImageUrl={bet.opponents[1].image_url}
+                  teamThatWasBetOnAcronym={teamThatWasBetOn.acronym}
+                  teamThatWasBetOnImageUrl={teamThatWasBetOn.image_url}
+                ></ViewCounterStrikeBet>
+              </Stack>
+            </div>
+          );
+        })}
+      </Stack>
+      <h2 className={`mb-4 text-x1 md:text-2x1`}>Completed bets</h2>
+      <Stack spacing={3}>
+        {settledBets.map(bet => {
           // get team from opponents
           const teamThatWasBetOn: Team = bet.opponents.find(team => bet.team_id == team.id);
           return (
