@@ -94,12 +94,14 @@ export default function Form(props: {
     <Paper key={matchId}>
       <Stack>
         <div>
-          Tournament:
+          <b>Tournament:</b>{' '}
           {props.match.fully_qualified_tournament_name
             ? props.match.fully_qualified_tournament_name
             : props.match.tournament_slug}
         </div>
-        <div>Scheduled at: {props.match.scheduled_at}</div>
+        <div>
+          <b>Scheduled at:</b> {props.match.scheduled_at}
+        </div>
 
         <div>
           {state.message && Object.keys(state.errors).length === 0 ? (
