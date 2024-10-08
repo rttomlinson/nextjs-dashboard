@@ -7,6 +7,7 @@ import { getUserIdFromSessionId } from '@/app/lib/actions';
 import { pool } from '@/app/lib/postgresConnection';
 import { formatDateToLocalWithTime } from '@/app/lib/utils';
 import ViewCounterStrikeBet from '@/app/ui/counterstrike/view-bet';
+import ViewCompletedCounterStrikeBet from '@/app/ui/counterstrike/view-completed-bet';
 
 export const metadata: Metadata = {
   title: 'Your CounterStrike Bets'
@@ -39,6 +40,7 @@ type CounterStrikeBet = {
   match_status: string;
   tournament_id: string;
   tournament_slag: string;
+  winner: Team;
 };
 
 async function getCounterStrikeBetsForUser(userId: string) {
@@ -63,7 +65,9 @@ async function getCounterStrikeBetsForUser(userId: string) {
         counterstrike_matches.scheduled_at,
         counterstrike_matches.status as match_status,
         counterstrike_matches.tournament_id,
-        counterstrike_matches.tournament_slug
+        counterstrike_matches.tournament_slug,
+        counterstrike_matches.winner,
+        counterstrike_matches.fully_qualified_tournament_name
       FROM counterstrike_bets
       JOIN counterstrike_matches ON counterstrike_bets.match_id=counterstrike_matches.match_id
       WHERE counterstrike_bets.user_id=$1
@@ -139,6 +143,7 @@ export default async function Page() {
                 <ViewCounterStrikeBet
                   matchScheduledAt={formatDateToLocalWithTime(bet.scheduled_at).toString()}
                   tournamentSlug={bet.tournament_slug}
+                  fullyQualifiedTournamentName={bet.fully_qualified_tournament_name}
                   team1Acronym={bet.opponents[0].acronym}
                   team2Acronym={bet.opponents[1].acronym}
                   team1ImageUrl={bet.opponents[0].image_url}
@@ -159,7 +164,7 @@ export default async function Page() {
           return (
             <div key={bet.id}>
               <Stack spacing={4} alignItems="center">
-                <ViewCounterStrikeBet
+                <ViewCompletedCounterStrikeBet
                   matchScheduledAt={formatDateToLocalWithTime(bet.scheduled_at).toString()}
                   tournamentSlug={bet.tournament_slug}
                   team1Acronym={bet.opponents[0].acronym}
@@ -168,7 +173,10 @@ export default async function Page() {
                   team2ImageUrl={bet.opponents[1].image_url}
                   teamThatWasBetOnAcronym={teamThatWasBetOn.acronym}
                   teamThatWasBetOnImageUrl={teamThatWasBetOn.image_url}
-                ></ViewCounterStrikeBet>
+                  teamThatWonAcronym={bet.winner.acronym}
+                  teamThatWonImageUrl={bet.winner.image_url}
+                  betOutcome={bet.outcome}
+                ></ViewCompletedCounterStrikeBet>
               </Stack>
             </div>
           );

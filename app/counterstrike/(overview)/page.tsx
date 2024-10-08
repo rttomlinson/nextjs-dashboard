@@ -17,6 +17,7 @@ export type Match = {
   tournament_slug: string;
   scheduled_at: string;
   opponents: Team[];
+  fully_qualified_tournament_name: string;
 };
 
 export type Team = {
@@ -56,6 +57,7 @@ export default async function Page() {
   return (
     <main>
       <h1 className={`mb-4 text-x1 md:text-2x1`}>Upcoming CounterStrike Matches</h1>
+      <h3>Bet on series outcomes</h3>
       {upcomingMatchesCount.length ? <></> : <p>No upcoming matches</p>}
       <UpcomingMatchesTable upcomingMatches={upcomingMatches}></UpcomingMatchesTable>
     </main>

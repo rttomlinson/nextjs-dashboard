@@ -3,7 +3,7 @@
 import Stack from '@mui/material/Stack';
 import Paper from '@mui/material/Paper';
 
-export default function ViewCounterStrikeBet({
+export default function ViewCompletedCounterStrikeBet({
   matchScheduledAt,
   tournamentSlug,
   team1Acronym,
@@ -12,7 +12,9 @@ export default function ViewCounterStrikeBet({
   team2ImageUrl,
   teamThatWasBetOnAcronym,
   teamThatWasBetOnImageUrl,
-  fullyQualifiedTournamentName
+  teamThatWonAcronym,
+  teamThatWonImageUrl,
+  betOutcome
 }: {
   matchScheduledAt: string;
   tournamentSlug: string;
@@ -22,11 +24,13 @@ export default function ViewCounterStrikeBet({
   team2ImageUrl: string;
   teamThatWasBetOnAcronym: string;
   teamThatWasBetOnImageUrl: string;
-  fullyQualifiedTournamentName: string;
+  teamThatWonAcronym: string;
+  teamThatWonImageUrl: string;
+  betOutcome: string;
 }) {
   return (
     <Paper>
-      <div>Tournament: {fullyQualifiedTournamentName ? fullyQualifiedTournamentName : tournamentSlug}</div>
+      <div>Tournament name: {tournamentSlug}</div>
       <div>Scheduled at: {matchScheduledAt}</div>
       <Stack direction="row" justifyContent="center" alignItems="center" spacing={4}>
         <Stack alignItems="center">
@@ -43,8 +47,15 @@ export default function ViewCounterStrikeBet({
           </Paper>
         </Stack>
       </Stack>
-      You bet on {teamThatWasBetOnAcronym} to take the series
-      <img src={teamThatWasBetOnImageUrl} style={{ height: '50px' }}></img>
+      <div>
+        You bet on {teamThatWasBetOnAcronym} to take the series
+        <img src={teamThatWasBetOnImageUrl} style={{ height: '50px' }}></img>
+      </div>
+      <div>
+        {teamThatWonAcronym} took the series
+        <img src={teamThatWonImageUrl} style={{ height: '50px' }}></img>
+      </div>
+      Bet was {betOutcome}
     </Paper>
   );
 }

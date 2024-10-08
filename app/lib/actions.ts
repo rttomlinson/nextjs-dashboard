@@ -254,10 +254,11 @@ export async function placeCounterStrikeBet(previousState: CounterStrikeBetState
       [userId, betAmountInCents, 'submitted', teamId, matchId, now.toISOString()]
     );
 
+    // if fully_qualified_tournament_name is null then use fallback
     await postgresClient.query(
       `
-        INSERT INTO counterstrike_matches(match_id, tournament_id, tournament_slug, scheduled_at, opponents, status)
-        VALUES           ($1, $2, $3, $4, $5, $6) ON CONFLICT (match_id) DO NOTHING;
+        INSERT INTO counterstrike_matches(match_id, tournament_id, tournament_slug, scheduled_at, opponents, status, fully_qualified_tournament_name)
+        VALUES           ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (match_id) DO NOTHING;
         `,
       [
         matchId,
@@ -265,7 +266,8 @@ export async function placeCounterStrikeBet(previousState: CounterStrikeBetState
         upcomingMatch.tournament_slug,
         upcomingMatch.scheduled_at,
         JSON.stringify(upcomingMatch.opponents),
-        'not_started'
+        'not_started',
+        upcomingMatch.fully_qualified_tournament_name
       ]
     );
     await postgresClient.query('COMMIT');
