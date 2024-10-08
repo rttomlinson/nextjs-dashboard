@@ -39,7 +39,7 @@ export default function ViewCompletedCounterStrikeBet({
             <img src={team1ImageUrl} style={{ height: '50px' }}></img>
           </Paper>
         </Stack>
-        <div>VS</div>
+        <div style={{ fontSize: '36px' }}>-</div>
         <Stack alignItems="center">
           {team2Acronym}
           <Paper>

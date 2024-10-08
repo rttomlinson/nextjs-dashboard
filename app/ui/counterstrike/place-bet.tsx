@@ -186,7 +186,13 @@ export default function Form(props: {
 
               <Grid size={12} display="flex">
                 <Item style={{ flexGrow: 1 }}>
-                  <Button style={{ width: '100%' }} value="banana" type="submit" variant="contained" name="teamId">
+                  <Button
+                    style={{ width: '100%' }}
+                    value={props.team1Id}
+                    type="submit"
+                    variant="contained"
+                    name="teamId"
+                  >
                     Bet
                   </Button>
                 </Item>
@@ -194,7 +200,7 @@ export default function Form(props: {
                   <Button
                     style={{ width: '100%' }}
                     color="secondary"
-                    value="pineapple"
+                    value={props.team2Id}
                     type="submit"
                     variant="contained"
                     name="teamId"
