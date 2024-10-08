@@ -27,6 +27,7 @@ export default function UpcomingMatchesTable({ upcomingMatches }: { upcomingMatc
         const match: Match = upcomingMatches[matchId];
         return (
           <Form
+            key={matchId}
             matchId={matchId}
             team1Id={match.opponents[0].id}
             team2Id={match.opponents[1].id}
