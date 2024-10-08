@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import Stack from '@mui/material/Stack';
-import Paper from '@mui/material/Paper';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { getUserIdFromSessionId } from '@/app/lib/actions';
@@ -13,13 +12,14 @@ export const metadata: Metadata = {
   title: 'Your CounterStrike Bets'
 };
 
-type Match = {
-  id: string;
-  tournament_id: string;
-  tournament_slug: string;
-  scheduled_at: string;
-  opponents: Team[];
-};
+// type Match = {
+//   id: string;
+//   tournament_id: string;
+//   tournament_slug: string;
+//   scheduled_at: string;
+//   opponents: Team[];
+//   fully_qualified_tournament_name: string;
+// };
 
 type Team = {
   id: string;
@@ -27,21 +27,21 @@ type Team = {
   image_url: string;
 };
 
-type CounterStrikeBet = {
-  id: string;
-  amount: number;
-  created_time: string;
-  bet_status: string;
-  bet_outcome: string;
-  winner_team_id: string;
-  match_id: string;
-  opponents: Team[];
-  scheduled_at: string;
-  match_status: string;
-  tournament_id: string;
-  tournament_slag: string;
-  winner: Team;
-};
+// type CounterStrikeBet = {
+//   id: string;
+//   amount: number;
+//   created_time: string;
+//   bet_status: string;
+//   bet_outcome: string;
+//   winner_team_id: string;
+//   match_id: string;
+//   opponents: Team[];
+//   scheduled_at: string;
+//   match_status: string;
+//   tournament_id: string;
+//   tournament_slag: string;
+//   winner: Team;
+// };
 
 async function getCounterStrikeBetsForUser(userId: string) {
   const client = await pool.connect();
@@ -99,7 +99,7 @@ export default async function Page() {
   const userId = await getUserIdFromSessionId(sessionId.value);
   const bets = await getCounterStrikeBetsForUser(userId);
   const betsLength = Object.keys(bets).length;
-  console.log(bets);
+  // console.log(bets);
 
   // Switch to relational database since upcoming matches also won't exist
 
@@ -113,7 +113,7 @@ export default async function Page() {
 
   // what were the outcomes
 
-  // split on 'settled' outcome versus not
+  // split on 'settled' outcome versus not and canceled
   const { settledBets, otherBets } = bets.reduce(
     (acc, bet) => {
       if (bet.bet_status == 'settled') {
@@ -124,6 +124,19 @@ export default async function Page() {
       return acc;
     },
     { settledBets: [], otherBets: [] }
+  );
+
+  // split settledBets for canceled
+  const { canceledBets, finishedBets } = settledBets.reduce(
+    (acc, bet) => {
+      if (bet.outcome == 'canceled') {
+        acc.canceledBets.push(bet);
+      } else {
+        acc.finishedBets.push(bet);
+      }
+      return acc;
+    },
+    { canceledBets: [], finishedBets: [] }
   );
 
   // how much money is tied up in bets?
@@ -160,26 +173,31 @@ export default async function Page() {
       <Stack spacing={3}>
         {settledBets.map(bet => {
           // get team from opponents
-          const teamThatWasBetOn: Team = bet.opponents.find(team => bet.team_id == team.id);
-          return (
-            <div key={bet.id}>
-              <Stack spacing={4} alignItems="center">
-                <ViewCompletedCounterStrikeBet
-                  matchScheduledAt={formatDateToLocalWithTime(bet.scheduled_at).toString()}
-                  tournamentSlug={bet.tournament_slug}
-                  team1Acronym={bet.opponents[0].acronym}
-                  team2Acronym={bet.opponents[1].acronym}
-                  team1ImageUrl={bet.opponents[0].image_url}
-                  team2ImageUrl={bet.opponents[1].image_url}
-                  teamThatWasBetOnAcronym={teamThatWasBetOn.acronym}
-                  teamThatWasBetOnImageUrl={teamThatWasBetOn.image_url}
-                  teamThatWonAcronym={bet.winner.acronym}
-                  teamThatWonImageUrl={bet.winner.image_url}
-                  betOutcome={bet.outcome}
-                ></ViewCompletedCounterStrikeBet>
-              </Stack>
-            </div>
-          );
+
+          if (bet.outcome == 'canceled') {
+            return <div key={bet.id}>Bet was canceled</div>;
+          } else {
+            const teamThatWasBetOn: Team = bet.opponents.find(team => bet.team_id == team.id);
+            return (
+              <div key={bet.id}>
+                <Stack spacing={4} alignItems="center">
+                  <ViewCompletedCounterStrikeBet
+                    matchScheduledAt={formatDateToLocalWithTime(bet.scheduled_at).toString()}
+                    tournamentSlug={bet.tournament_slug}
+                    team1Acronym={bet.opponents[0].acronym}
+                    team2Acronym={bet.opponents[1].acronym}
+                    team1ImageUrl={bet.opponents[0].image_url}
+                    team2ImageUrl={bet.opponents[1].image_url}
+                    teamThatWasBetOnAcronym={teamThatWasBetOn.acronym}
+                    teamThatWasBetOnImageUrl={teamThatWasBetOn.image_url}
+                    teamThatWonAcronym={bet.winner.acronym}
+                    teamThatWonImageUrl={bet.winner.image_url}
+                    betOutcome={bet.outcome}
+                  ></ViewCompletedCounterStrikeBet>
+                </Stack>
+              </div>
+            );
+          }
         })}
       </Stack>
     </main>
