@@ -74,13 +74,18 @@ export default function Form(props: {
 
   const [value, setValue] = React.useState<number | string>(500);
 
-  const handleSliderChange = (event: Event, newValue: number | number[]) => {
+  const handleSliderChange = (event: Event, newValue: number | number[] | string) => {
     setValue(newValue as number);
   };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     // setValue(event.target.value === '' ? 0 : Number(event.target.value));
-    setValue(event.target.value === '' ? '' : Number(event.target.value));
+    // if type text and cannot be coerced into a number then set to empty
+    if (typeof event.target.value === 'string' && isNaN(Number(event.target.value))) {
+      setValue('');
+    } else {
+      setValue(event.target.value === '' ? '' : Number(event.target.value));
+    }
   };
 
   // const handleBlur = () => {
