@@ -62,7 +62,7 @@ async function getCounterStrikeBetsForUser(userId: string) {
         counterstrike_bets.team_id,
         counterstrike_bets.match_id,
         counterstrike_matches.opponents,
-        counterstrike_matches.scheduled_at,
+        counterstrike_matches.scheduled_at::TEXT,
         counterstrike_matches.status as match_status,
         counterstrike_matches.tournament_id,
         counterstrike_matches.tournament_slug,
