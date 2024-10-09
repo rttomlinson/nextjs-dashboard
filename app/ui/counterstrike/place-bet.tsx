@@ -72,28 +72,15 @@ export default function Form(props: {
   // console.log(state);
   const matchId = props.matchId;
 
-  const [value, setValue] = React.useState<number | string>(500);
+  // const [value, setValue] = React.useState<number | undefined>(500);
 
-  const handleSliderChange = (event: Event, newValue: number | number[] | string) => {
-    setValue(newValue as number);
-  };
-
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    // setValue(event.target.value === '' ? 0 : Number(event.target.value));
-    // if type text and cannot be coerced into a number then set to empty
-    if (typeof event.target.value === 'string' && isNaN(Number(event.target.value))) {
-      setValue('');
-    } else {
-      setValue(event.target.value === '' ? '' : Number(event.target.value));
-    }
-  };
-
-  // const handleBlur = () => {
-  //   if (value < 0) {
-  //     setValue(0);
-  //   } else if (value > 100) {
-  //     setValue(100);
-  //   }
+  // // const handleSliderChange = (event: Event, newValue: number | number[] | string) => {
+  // //   setValue(newValue as number);
+  // // };
+  // const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   // setValue(event.target.value === '' ? 0 : Number(event.target.value));
+  //   // if type text and cannot be coerced into a number then set to empty
+  //   setValue(event.target.value == '' ? undefined : Number(event.target.value));
   // };
 
   // TODO: Toggle for UTC
@@ -137,28 +124,18 @@ export default function Form(props: {
                 <Grid>
                   <Input
                     disabled={true}
-                    value={value}
+                    // value={value}
+                    defaultValue={500}
                     size="small"
-                    onChange={handleInputChange}
+                    // onChange={handleInputChange}
                     // onBlur={handleBlur}
                     inputProps={{
                       step: 1,
                       min: 1,
                       max: 1000,
-                      type: 'text',
+                      type: 'number',
                       'aria-labelledby': 'input-slider'
                     }}
-                  />
-                </Grid>
-                <Grid size={6}>
-                  <Slider
-                    disabled={true}
-                    value={typeof value === 'number' ? value : 0}
-                    onChange={handleSliderChange}
-                    aria-labelledby="input-slider"
-                    step={10}
-                    min={1}
-                    max={1000}
                   />
                 </Grid>
               </Grid>
