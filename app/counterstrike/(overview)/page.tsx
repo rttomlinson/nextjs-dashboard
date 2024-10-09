@@ -52,7 +52,7 @@ export default async function Page() {
   noStore();
 
   return (
-    <main>
+    <main suppressHydrationWarning={true}>
       <h1 className={`mb-4 text-x1 md:text-2x1`}>Upcoming CounterStrike Matches</h1>
       <h3>Bet on series outcomes</h3>
       {upcomingMatchesCount.length ? <></> : <p>No upcoming matches</p>}

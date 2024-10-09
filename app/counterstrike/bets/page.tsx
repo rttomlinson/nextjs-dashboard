@@ -151,7 +151,7 @@ export default async function Page() {
           // get team from opponents
           const teamThatWasBetOn: Team = bet.opponents.find(team => bet.team_id == team.id);
           return (
-            <div key={bet.id}>
+            <div key={bet.id} suppressHydrationWarning={true}>
               <ViewCounterStrikeBet
                 matchScheduledAt={bet.scheduled_at}
                 tournamentSlug={bet.tournament_slug}
@@ -174,7 +174,7 @@ export default async function Page() {
 
           if (bet.outcome == 'canceled') {
             return (
-              <div key={bet.id}>
+              <div key={bet.id} suppressHydrationWarning={true}>
                 <ViewCanceledCounterStrikeBet
                   fullyQualifiedTournamentName={bet.fully_qualified_tournament_name}
                   matchScheduledAt={bet.scheduled_at}
@@ -188,7 +188,7 @@ export default async function Page() {
           } else {
             const teamThatWasBetOn: Team = bet.opponents.find(team => bet.team_id == team.id);
             return (
-              <div key={bet.id}>
+              <div key={bet.id} suppressHydrationWarning={true}>
                 <ViewCompletedCounterStrikeBet
                   matchScheduledAt={bet.scheduled_at}
                   fullyQualifiedTournamentName={bet.fully_qualified_tournament_name}
