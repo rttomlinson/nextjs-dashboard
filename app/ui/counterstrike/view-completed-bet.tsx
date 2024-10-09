@@ -41,16 +41,12 @@ export default function ViewCompletedCounterStrikeBet({
       <Stack direction="row" justifyContent="center" alignItems="center" spacing={4}>
         <Stack alignItems="center">
           {team1Acronym}
-          <Paper>
-            <img src={team1ImageUrl} style={{ height: '50px' }}></img>
-          </Paper>
+          <img src={team1ImageUrl} style={{ height: '50px' }}></img>
         </Stack>
         <div style={{ fontSize: '36px' }}>-</div>
         <Stack alignItems="center">
           {team2Acronym}
-          <Paper>
-            <img src={team2ImageUrl} style={{ height: '50px' }}></img>
-          </Paper>
+          <img src={team2ImageUrl} style={{ height: '50px' }}></img>
         </Stack>
       </Stack>
       <div>

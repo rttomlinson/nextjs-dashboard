@@ -1,8 +1,5 @@
-// 'use client';
 import { Metadata } from 'next';
-// import Stack from '@mui/material/Stack';
-// import Paper from '@mui/material/Paper';
-// import Form from '@/app/ui/counterstrike/place-bet';
+
 import UpcomingMatchesTable from '@/app/ui/counterstrike/place-bets-area';
 import { unstable_noStore as noStore } from 'next/cache';
 import { createRedisClient } from '@/app/lib/redisConnection';

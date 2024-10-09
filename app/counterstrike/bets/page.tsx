@@ -4,7 +4,6 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { getUserIdFromSessionId } from '@/app/lib/actions';
 import { pool } from '@/app/lib/postgresConnection';
-import { formatDateToLocalWithTime } from '@/app/lib/utils';
 import ViewCounterStrikeBet from '@/app/ui/counterstrike/view-bet';
 import ViewCompletedCounterStrikeBet from '@/app/ui/counterstrike/view-completed-bet';
 import ViewCanceledCounterStrikeBet from '@/app/ui/counterstrike/view-canceled-bet';
@@ -153,19 +152,17 @@ export default async function Page() {
           const teamThatWasBetOn: Team = bet.opponents.find(team => bet.team_id == team.id);
           return (
             <div key={bet.id}>
-              <Stack spacing={4} alignItems="center">
-                <ViewCounterStrikeBet
-                  matchScheduledAt={formatDateToLocalWithTime(bet.scheduled_at).toString()}
-                  tournamentSlug={bet.tournament_slug}
-                  fullyQualifiedTournamentName={bet.fully_qualified_tournament_name}
-                  team1Acronym={bet.opponents[0].acronym}
-                  team2Acronym={bet.opponents[1].acronym}
-                  team1ImageUrl={bet.opponents[0].image_url}
-                  team2ImageUrl={bet.opponents[1].image_url}
-                  teamThatWasBetOnAcronym={teamThatWasBetOn.acronym}
-                  teamThatWasBetOnImageUrl={teamThatWasBetOn.image_url}
-                ></ViewCounterStrikeBet>
-              </Stack>
+              <ViewCounterStrikeBet
+                matchScheduledAt={bet.scheduled_at}
+                tournamentSlug={bet.tournament_slug}
+                fullyQualifiedTournamentName={bet.fully_qualified_tournament_name}
+                team1Acronym={bet.opponents[0].acronym}
+                team2Acronym={bet.opponents[1].acronym}
+                team1ImageUrl={bet.opponents[0].image_url}
+                team2ImageUrl={bet.opponents[1].image_url}
+                teamThatWasBetOnAcronym={teamThatWasBetOn.acronym}
+                teamThatWasBetOnImageUrl={teamThatWasBetOn.image_url}
+              ></ViewCounterStrikeBet>
             </div>
           );
         })}
@@ -177,35 +174,35 @@ export default async function Page() {
 
           if (bet.outcome == 'canceled') {
             return (
-              <ViewCanceledCounterStrikeBet
-                fullyQualifiedTournamentName={bet.fully_qualified_tournament_name}
-                matchScheduledAt={formatDateToLocalWithTime(bet.scheduled_at).toString()}
-                tournamentSlug={bet.tournament_slug}
-                team1ImageUrl={bet.opponents[0].image_url}
-                team2ImageUrl={bet.opponents[1].image_url}
-              ></ViewCanceledCounterStrikeBet>
+              <div key={bet.id}>
+                <ViewCanceledCounterStrikeBet
+                  fullyQualifiedTournamentName={bet.fully_qualified_tournament_name}
+                  matchScheduledAt={bet.scheduled_at}
+                  tournamentSlug={bet.tournament_slug}
+                  team1ImageUrl={bet.opponents[0].image_url}
+                  team2ImageUrl={bet.opponents[1].image_url}
+                ></ViewCanceledCounterStrikeBet>
+              </div>
             );
             // return <div key={bet.id}>Bet was canceled</div>;
           } else {
             const teamThatWasBetOn: Team = bet.opponents.find(team => bet.team_id == team.id);
             return (
               <div key={bet.id}>
-                <Stack spacing={4} alignItems="center">
-                  <ViewCompletedCounterStrikeBet
-                    matchScheduledAt={formatDateToLocalWithTime(bet.scheduled_at).toString()}
-                    fullyQualifiedTournamentName={bet.fully_qualified_tournament_name}
-                    tournamentSlug={bet.tournament_slug}
-                    team1Acronym={bet.opponents[0].acronym}
-                    team2Acronym={bet.opponents[1].acronym}
-                    team1ImageUrl={bet.opponents[0].image_url}
-                    team2ImageUrl={bet.opponents[1].image_url}
-                    teamThatWasBetOnAcronym={teamThatWasBetOn.acronym}
-                    teamThatWasBetOnImageUrl={teamThatWasBetOn.image_url}
-                    teamThatWonAcronym={bet.winner.acronym}
-                    teamThatWonImageUrl={bet.winner.image_url}
-                    betOutcome={bet.outcome}
-                  ></ViewCompletedCounterStrikeBet>
-                </Stack>
+                <ViewCompletedCounterStrikeBet
+                  matchScheduledAt={bet.scheduled_at}
+                  fullyQualifiedTournamentName={bet.fully_qualified_tournament_name}
+                  tournamentSlug={bet.tournament_slug}
+                  team1Acronym={bet.opponents[0].acronym}
+                  team2Acronym={bet.opponents[1].acronym}
+                  team1ImageUrl={bet.opponents[0].image_url}
+                  team2ImageUrl={bet.opponents[1].image_url}
+                  teamThatWasBetOnAcronym={teamThatWasBetOn.acronym}
+                  teamThatWasBetOnImageUrl={teamThatWasBetOn.image_url}
+                  teamThatWonAcronym={bet.winner.acronym}
+                  teamThatWonImageUrl={bet.winner.image_url}
+                  betOutcome={bet.outcome}
+                ></ViewCompletedCounterStrikeBet>
               </div>
             );
           }

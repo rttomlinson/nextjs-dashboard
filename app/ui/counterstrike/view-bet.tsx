@@ -2,6 +2,7 @@
 
 import Stack from '@mui/material/Stack';
 import Paper from '@mui/material/Paper';
+import { formatDateToLocalWithTime } from '@/app/lib/utils';
 
 export default function ViewCounterStrikeBet({
   matchScheduledAt,
@@ -26,21 +27,21 @@ export default function ViewCounterStrikeBet({
 }) {
   return (
     <Paper>
-      <div>Tournament: {fullyQualifiedTournamentName ? fullyQualifiedTournamentName : tournamentSlug}</div>
-      <div>Scheduled at: {matchScheduledAt}</div>
+      <div>
+        <b>Tournament:</b> {fullyQualifiedTournamentName ? fullyQualifiedTournamentName : tournamentSlug}
+      </div>
+      <div>
+        <b>Scheduled at:</b> {formatDateToLocalWithTime(matchScheduledAt)}
+      </div>
       <Stack direction="row" justifyContent="center" alignItems="center" spacing={4}>
         <Stack alignItems="center">
           {team1Acronym}
-          <Paper>
-            <img src={team1ImageUrl} style={{ height: '50px' }}></img>
-          </Paper>
+          <img src={team1ImageUrl} style={{ height: '50px' }}></img>
         </Stack>
-        <div>VS</div>
+        <div style={{ fontSize: '36px' }}>-</div>
         <Stack alignItems="center">
           {team2Acronym}
-          <Paper>
-            <img src={team2ImageUrl} style={{ height: '50px' }}></img>
-          </Paper>
+          <img src={team2ImageUrl} style={{ height: '50px' }}></img>
         </Stack>
       </Stack>
       You bet on {teamThatWasBetOnAcronym} to take the series

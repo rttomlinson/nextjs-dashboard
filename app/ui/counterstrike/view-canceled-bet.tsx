@@ -1,7 +1,9 @@
 'use client';
 
 import Box from '@mui/material/Box';
+import Paper from '@mui/material/Paper';
 
+import { formatDateToLocalWithTime } from '@/app/lib/utils';
 export default function ViewCanceledCounterStrikeBet({
   matchScheduledAt,
   tournamentSlug,
@@ -30,17 +32,17 @@ export default function ViewCanceledCounterStrikeBet({
   fullyQualifiedTournamentName: string;
 }) {
   return (
-    <Box>
+    <Paper>
       <div>
         <b>Tournament:</b> {fullyQualifiedTournamentName ? fullyQualifiedTournamentName : tournamentSlug}
       </div>
       <div>
-        <b>Scheduled at:</b> {matchScheduledAt}
+        <b>Scheduled at:</b> {formatDateToLocalWithTime(matchScheduledAt)}
       </div>
       <img src={team1ImageUrl} style={{ height: '50px' }}></img>
       <div style={{ fontSize: '36px' }}>-</div>
       <img src={team2ImageUrl} style={{ height: '50px' }}></img>
-      Bet was canceled. Money has been refunded.
-    </Box>
+      Match was canceled. Money has been refunded.
+    </Paper>
   );
 }

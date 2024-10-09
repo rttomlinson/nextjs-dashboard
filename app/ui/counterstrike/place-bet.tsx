@@ -8,19 +8,15 @@ import { styled } from '@mui/material/styles';
 import Alert from '@mui/material/Alert';
 import CheckIcon from '@mui/icons-material/Check';
 import React from 'react';
-import { useState } from 'react';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 
-import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 
 import Grid from '@mui/material/Grid2';
 
 import Typography from '@mui/material/Typography';
-import Slider from '@mui/material/Slider';
 import MuiInput from '@mui/material/Input';
-// import VolumeUp from '@mui/icons-material/VolumeUp';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import { formatDateToLocalWithTime } from '@/app/lib/utils';
 
@@ -65,9 +61,6 @@ export default function Form(props: {
   // TODO: Make it so you can't specify the team nor the matchId directly
   const initialState = { errors: {}, message: null };
   const [state, dispatch] = useFormState(placeCounterStrikeBet, initialState);
-
-  const defaultSelectedTeamLogoImage = 'team1LogoImage';
-  const [selected, setSelected] = useState(defaultSelectedTeamLogoImage);
 
   // console.log(state);
   const matchId = props.matchId;
@@ -145,24 +138,12 @@ export default function Form(props: {
                 <Stack direction="row" justifyContent="center" alignItems="center" spacing={4}>
                   <Stack alignItems="center">
                     {props.match.opponents[0].acronym}
-                    <Paper id="team1Logo" elevation={selected == 'team1LogoImage' ? 0 : 0}>
-                      <img
-                        id="team1LogoImage"
-                        src={props.match.opponents[0].image_url}
-                        style={{ height: '50px' }}
-                      ></img>
-                    </Paper>
+                    <img id="team1LogoImage" src={props.match.opponents[0].image_url} style={{ height: '50px' }}></img>
                   </Stack>
                   <div style={{ fontSize: '36px' }}>-</div>
                   <Stack alignItems="center">
                     {props.match.opponents[1].acronym}
-                    <Paper id="team1Logo" elevation={selected == 'team2LogoImage' ? 0 : 0}>
-                      <img
-                        id="team2LogoImage"
-                        src={props.match.opponents[1].image_url}
-                        style={{ height: '50px' }}
-                      ></img>
-                    </Paper>
+                    <img id="team2LogoImage" src={props.match.opponents[1].image_url} style={{ height: '50px' }}></img>
                   </Stack>
                 </Stack>
               </Item>

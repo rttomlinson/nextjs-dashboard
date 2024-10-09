@@ -86,7 +86,6 @@ export default async function Page({
   }
   const userId = await getUserIdFromSessionId(sessionId.value);
   // get user id from session id
-
   let bets = await fetchFilteredBets(userId);
   //update each bet with iana based on coordinates
   bets = bets.map(bet => {
