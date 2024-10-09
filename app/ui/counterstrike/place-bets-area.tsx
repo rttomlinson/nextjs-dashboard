@@ -1,6 +1,6 @@
 'use client';
 import Stack from '@mui/material/Stack';
-// import Paper from '@mui/material/Paper';
+import Paper from '@mui/material/Paper';
 import Form from '@/app/ui/counterstrike/place-bet';
 // import { useState } from 'react';
 export type Match = {
@@ -26,15 +26,17 @@ export default function UpcomingMatchesTable({ upcomingMatches }: { upcomingMatc
       {Object.keys(upcomingMatches)?.map(matchId => {
         const match: Match = upcomingMatches[matchId];
         return (
-          <Form
-            key={matchId}
-            matchId={matchId}
-            team1Id={match.opponents[0].id}
-            team2Id={match.opponents[1].id}
-            team1Acronym={match.opponents[0].acronym}
-            team2Acronym={match.opponents[1].acronym}
-            match={match}
-          ></Form>
+          <Paper key={matchId}>
+            <Form
+              key={matchId}
+              matchId={matchId}
+              team1Id={match.opponents[0].id}
+              team2Id={match.opponents[1].id}
+              team1Acronym={match.opponents[0].acronym}
+              team2Acronym={match.opponents[1].acronym}
+              match={match}
+            ></Form>
+          </Paper>
         );
       })}
     </Stack>

@@ -94,128 +94,120 @@ export default function Form(props: {
   // TODO: Toggle for UTC
 
   return (
-    <Paper key={matchId}>
-      <Stack>
-        <div>
-          <b>Tournament:</b>{' '}
-          {props.match.fully_qualified_tournament_name
-            ? props.match.fully_qualified_tournament_name
-            : props.match.tournament_slug}
-        </div>
-        <div>
-          <b>Scheduled at:</b> {formatDateToLocalWithTime(props.match.scheduled_at)}
-        </div>
+    <Box>
+      <div>
+        <b>Tournament:</b>{' '}
+        {props.match.fully_qualified_tournament_name
+          ? props.match.fully_qualified_tournament_name
+          : props.match.tournament_slug}
+      </div>
+      <div>
+        <b>Scheduled at:</b> {formatDateToLocalWithTime(props.match.scheduled_at)}
+      </div>
 
-        <div>
-          {state.message && Object.keys(state.errors).length === 0 ? (
-            <Alert icon={<CheckIcon fontSize="inherit" />} severity="success">
-              Bet was successfully placed.
-            </Alert>
-          ) : state.errors?.amount ? (
-            <Alert icon={<CheckIcon fontSize="inherit" />} severity="error">
-              {state.errors?.amount}
-            </Alert>
-          ) : (
-            <></>
-          )}
-          <form action={dispatch}>
-            <input type="hidden" name="matchId" value={props.matchId} />
+      <div>
+        {state.message && Object.keys(state.errors).length === 0 ? (
+          <Alert icon={<CheckIcon fontSize="inherit" />} severity="success">
+            Bet was successfully placed.
+          </Alert>
+        ) : state.errors?.amount ? (
+          <Alert icon={<CheckIcon fontSize="inherit" />} severity="error">
+            {state.errors?.amount}
+          </Alert>
+        ) : (
+          <></>
+        )}
+        <form action={dispatch}>
+          <input type="hidden" name="matchId" value={props.matchId} />
 
-            <Grid container spacing={2}>
-              <Box sx={{ width: '100%' }}>
-                <Typography id="input-slider" gutterBottom>
-                  Bet amount
-                </Typography>
-                <Grid container spacing={2} sx={{ alignItems: 'center' }}>
-                  <Grid>
-                    <AttachMoneyIcon />
-                  </Grid>
-                  <Grid>
-                    <Input
-                      disabled={true}
-                      value={value}
-                      size="small"
-                      onChange={handleInputChange}
-                      // onBlur={handleBlur}
-                      inputProps={{
-                        step: 1,
-                        min: 1,
-                        max: 1000,
-                        type: 'text',
-                        'aria-labelledby': 'input-slider'
-                      }}
-                    />
-                  </Grid>
-                  <Grid size={6}>
-                    <Slider
-                      disabled={true}
-                      value={typeof value === 'number' ? value : 0}
-                      onChange={handleSliderChange}
-                      aria-labelledby="input-slider"
-                      step={10}
-                      min={1}
-                      max={1000}
-                    />
-                  </Grid>
+          <Grid container spacing={2}>
+            <Box sx={{ width: '100%' }}>
+              <Typography id="input-slider" gutterBottom>
+                Bet amount
+              </Typography>
+              <Grid container spacing={2} sx={{ alignItems: 'center' }}>
+                <Grid>
+                  <AttachMoneyIcon />
                 </Grid>
-              </Box>
-              <Grid size={12}>
-                <Item>
-                  <Stack direction="row" justifyContent="center" alignItems="center" spacing={4}>
-                    <Stack alignItems="center">
-                      {props.match.opponents[0].acronym}
-                      <Paper id="team1Logo" elevation={selected == 'team1LogoImage' ? 0 : 0}>
-                        <img
-                          id="team1LogoImage"
-                          src={props.match.opponents[0].image_url}
-                          style={{ height: '50px' }}
-                        ></img>
-                      </Paper>
-                    </Stack>
-                    <div style={{ fontSize: '36px' }}>-</div>
-                    <Stack alignItems="center">
-                      {props.match.opponents[1].acronym}
-                      <Paper id="team1Logo" elevation={selected == 'team2LogoImage' ? 0 : 0}>
-                        <img
-                          id="team2LogoImage"
-                          src={props.match.opponents[1].image_url}
-                          style={{ height: '50px' }}
-                        ></img>
-                      </Paper>
-                    </Stack>
+                <Grid>
+                  <Input
+                    disabled={true}
+                    value={value}
+                    size="small"
+                    onChange={handleInputChange}
+                    // onBlur={handleBlur}
+                    inputProps={{
+                      step: 1,
+                      min: 1,
+                      max: 1000,
+                      type: 'text',
+                      'aria-labelledby': 'input-slider'
+                    }}
+                  />
+                </Grid>
+                <Grid size={6}>
+                  <Slider
+                    disabled={true}
+                    value={typeof value === 'number' ? value : 0}
+                    onChange={handleSliderChange}
+                    aria-labelledby="input-slider"
+                    step={10}
+                    min={1}
+                    max={1000}
+                  />
+                </Grid>
+              </Grid>
+            </Box>
+            <Grid size={12}>
+              <Item>
+                <Stack direction="row" justifyContent="center" alignItems="center" spacing={4}>
+                  <Stack alignItems="center">
+                    {props.match.opponents[0].acronym}
+                    <Paper id="team1Logo" elevation={selected == 'team1LogoImage' ? 0 : 0}>
+                      <img
+                        id="team1LogoImage"
+                        src={props.match.opponents[0].image_url}
+                        style={{ height: '50px' }}
+                      ></img>
+                    </Paper>
                   </Stack>
-                </Item>
-              </Grid>
-
-              <Grid size={12} display="flex">
-                <Item style={{ flexGrow: 1 }}>
-                  <Button
-                    style={{ width: '100%' }}
-                    value={props.team1Id}
-                    type="submit"
-                    variant="contained"
-                    name="teamId"
-                  >
-                    Bet
-                  </Button>
-                </Item>
-                <Item style={{ flexGrow: 1 }}>
-                  <Button
-                    style={{ width: '100%' }}
-                    color="secondary"
-                    value={props.team2Id}
-                    type="submit"
-                    variant="contained"
-                    name="teamId"
-                  >
-                    Bet
-                  </Button>
-                </Item>
-              </Grid>
+                  <div style={{ fontSize: '36px' }}>-</div>
+                  <Stack alignItems="center">
+                    {props.match.opponents[1].acronym}
+                    <Paper id="team1Logo" elevation={selected == 'team2LogoImage' ? 0 : 0}>
+                      <img
+                        id="team2LogoImage"
+                        src={props.match.opponents[1].image_url}
+                        style={{ height: '50px' }}
+                      ></img>
+                    </Paper>
+                  </Stack>
+                </Stack>
+              </Item>
             </Grid>
-          </form>
-        </div>
-      </Stack>
-    </Paper>
+
+            <Grid size={12} display="flex">
+              <Item style={{ flexGrow: 1 }}>
+                <Button style={{ width: '100%' }} value={props.team1Id} type="submit" variant="contained" name="teamId">
+                  Bet
+                </Button>
+              </Item>
+              <Item style={{ flexGrow: 1 }}>
+                <Button
+                  style={{ width: '100%' }}
+                  color="secondary"
+                  value={props.team2Id}
+                  type="submit"
+                  variant="contained"
+                  name="teamId"
+                >
+                  Bet
+                </Button>
+              </Item>
+            </Grid>
+          </Grid>
+        </form>
+      </div>
+    </Box>
   );
 }
