@@ -7,6 +7,7 @@ import { pool } from '@/app/lib/postgresConnection';
 import { formatDateToLocalWithTime } from '@/app/lib/utils';
 import ViewCounterStrikeBet from '@/app/ui/counterstrike/view-bet';
 import ViewCompletedCounterStrikeBet from '@/app/ui/counterstrike/view-completed-bet';
+import ViewCanceledCounterStrikeBet from '@/app/ui/counterstrike/view-canceled-bet';
 
 export const metadata: Metadata = {
   title: 'Your CounterStrike Bets'
@@ -175,7 +176,16 @@ export default async function Page() {
           // get team from opponents
 
           if (bet.outcome == 'canceled') {
-            return <div key={bet.id}>Bet was canceled</div>;
+            return (
+              <ViewCanceledCounterStrikeBet
+                fullyQualifiedTournamentName={bet.fully_qualified_tournament_name}
+                matchScheduledAt={formatDateToLocalWithTime(bet.scheduled_at).toString()}
+                tournamentSlug={bet.tournament_slug}
+                team1ImageUrl={bet.opponents[0].image_url}
+                team2ImageUrl={bet.opponents[1].image_url}
+              ></ViewCanceledCounterStrikeBet>
+            );
+            // return <div key={bet.id}>Bet was canceled</div>;
           } else {
             const teamThatWasBetOn: Team = bet.opponents.find(team => bet.team_id == team.id);
             return (
@@ -183,6 +193,7 @@ export default async function Page() {
                 <Stack spacing={4} alignItems="center">
                   <ViewCompletedCounterStrikeBet
                     matchScheduledAt={formatDateToLocalWithTime(bet.scheduled_at).toString()}
+                    fullyQualifiedTournamentName={bet.fully_qualified_tournament_name}
                     tournamentSlug={bet.tournament_slug}
                     team1Acronym={bet.opponents[0].acronym}
                     team2Acronym={bet.opponents[1].acronym}

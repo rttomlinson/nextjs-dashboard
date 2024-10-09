@@ -22,6 +22,7 @@ import Slider from '@mui/material/Slider';
 import MuiInput from '@mui/material/Input';
 // import VolumeUp from '@mui/icons-material/VolumeUp';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import { formatDateToLocalWithTime } from '@/app/lib/utils';
 
 const Input = styled(MuiInput)`
   width: 64px;
@@ -90,6 +91,8 @@ export default function Form(props: {
   //   }
   // };
 
+  // TODO: Toggle for UTC
+
   return (
     <Paper key={matchId}>
       <Stack>
@@ -100,7 +103,7 @@ export default function Form(props: {
             : props.match.tournament_slug}
         </div>
         <div>
-          <b>Scheduled at:</b> {props.match.scheduled_at}
+          <b>Scheduled at:</b> {formatDateToLocalWithTime(props.match.scheduled_at)}
         </div>
 
         <div>

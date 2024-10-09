@@ -14,7 +14,8 @@ export default function ViewCompletedCounterStrikeBet({
   teamThatWasBetOnImageUrl,
   teamThatWonAcronym,
   teamThatWonImageUrl,
-  betOutcome
+  betOutcome,
+  fullyQualifiedTournamentName
 }: {
   matchScheduledAt: string;
   tournamentSlug: string;
@@ -27,11 +28,16 @@ export default function ViewCompletedCounterStrikeBet({
   teamThatWonAcronym: string;
   teamThatWonImageUrl: string;
   betOutcome: string;
+  fullyQualifiedTournamentName: string;
 }) {
   return (
     <Paper>
-      <div>Tournament name: {tournamentSlug}</div>
-      <div>Scheduled at: {matchScheduledAt}</div>
+      <div>
+        <b>Tournament:</b> {fullyQualifiedTournamentName ? fullyQualifiedTournamentName : tournamentSlug}
+      </div>
+      <div>
+        <b>Scheduled at:</b> {matchScheduledAt}
+      </div>
       <Stack direction="row" justifyContent="center" alignItems="center" spacing={4}>
         <Stack alignItems="center">
           {team1Acronym}
