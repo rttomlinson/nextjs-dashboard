@@ -71,7 +71,7 @@ async function getCounterStrikeBetsForUser(userId: string) {
       FROM counterstrike_bets
       JOIN counterstrike_matches ON counterstrike_bets.match_id=counterstrike_matches.match_id
       WHERE counterstrike_bets.user_id=$1
-      ORDER BY counterstrike_bets.date DESC
+      ORDER BY counterstrike_bets.date ASC
       LIMIT 20
     `,
       [userId]
@@ -143,7 +143,7 @@ export default async function Page() {
 
   return (
     <main>
-      <h1 className={`mb-4 text-x1 md:text-2x1`}>You bets on CounterStrike Matches</h1>
+      <h1 className={`mb-4 text-x1 md:text-2x1`}>Your CounterStrike bets</h1>
       {betsLength ? <></> : <p>You haven't placed bets on any matches yet</p>}
       <h2 className={`mb-4 text-x1 md:text-2x1`}>Pending bets</h2>
       <Stack spacing={3}>
