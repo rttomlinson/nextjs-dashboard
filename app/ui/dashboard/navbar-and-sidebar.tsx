@@ -1,7 +1,6 @@
 'use client';
 import { useRouter, redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
-// import { signOut } from '@/auth';
 
 import { useContext, useState } from 'react';
 import AuthContext from '@/stores/authContext';
@@ -163,6 +162,33 @@ export default function NavbarAndSidebar({ children }) {
         }
       }
     ];
+
+    const counterstrikeMenu = [
+      {
+        text: 'Upcoming Counterstrike Matches',
+        icon: <DashboardIcon />,
+        action: function (text) {
+          console.log(` ${text}`);
+          router.push('/counterstrike');
+        }
+      },
+      {
+        text: 'My Counterstrike Bets',
+        icon: <ListAltIcon />,
+        action: function (text) {
+          router.push('/counterstrike/bets');
+        }
+      }
+    ];
+    const accountMenu = [
+      {
+        text: 'My account',
+        icon: <CasinoIcon />,
+        action: function (text) {
+          router.push('/account');
+        }
+      }
+    ];
     return (
       <div>
         <Toolbar />
@@ -180,6 +206,28 @@ export default function NavbarAndSidebar({ children }) {
         <Divider />
         <Button onClick={recordLocation}>Record Location</Button>
         <div>{recordStatus?.message}</div>
+        <Divider />
+        <List>
+          {counterstrikeMenu.map((data, index) => (
+            <ListItem key={data.text} disablePadding>
+              <ListItemButton onClick={() => data.action(data.text)}>
+                <ListItemIcon>{data.icon}</ListItemIcon>
+                <ListItemText primary={data.text} />
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List>
+        <Divider />
+        <List>
+          {accountMenu.map((data, index) => (
+            <ListItem key={data.text} disablePadding>
+              <ListItemButton onClick={() => data.action(data.text)}>
+                <ListItemIcon>{data.icon}</ListItemIcon>
+                <ListItemText primary={data.text} />
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List>
       </div>
     );
   };
