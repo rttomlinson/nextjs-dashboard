@@ -2,6 +2,11 @@
 import Stack from '@mui/material/Stack';
 import Paper from '@mui/material/Paper';
 import Form from '@/app/ui/counterstrike/place-bet';
+
+import dayjs from 'dayjs';
+dayjs.extend(utc);
+import utc from 'dayjs/plugin/utc';
+
 // import { useState } from 'react';
 export type Match = {
   id: string;
@@ -19,11 +24,18 @@ export type Team = {
 };
 
 export default function UpcomingMatchesTable({ upcomingMatches }: { upcomingMatches: { [key: string]: Match } }) {
-  // const upcomingMatches = JSON.parse(upcomingMatchesJSON);
-  // const [selected, setSelected] = useState(true);
+  // Sort by ascending scheduled_at time
+  let upcomingMatchesKeys: string[] = Object.keys(upcomingMatches);
+  upcomingMatchesKeys.sort((a, b) => {
+    let aTime = dayjs(upcomingMatches[a].scheduled_at);
+    let bTime = dayjs(upcomingMatches[b].scheduled_at);
+    if (aTime.isBefore(bTime)) return -1;
+    else return 1;
+  });
+
   return (
     <Stack spacing={3}>
-      {Object.keys(upcomingMatches)?.map(matchId => {
+      {upcomingMatchesKeys.map(matchId => {
         const match: Match = upcomingMatches[matchId];
         return (
           <Paper key={matchId}>

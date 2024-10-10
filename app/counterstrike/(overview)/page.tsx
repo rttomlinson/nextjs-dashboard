@@ -41,13 +41,7 @@ async function getUpcomingSAndATierMatches() {
 
 export default async function Page() {
   let upcomingMatches: { [key: string]: Match } = await getUpcomingSAndATierMatches();
-  // await new Promise(function (resolve, reject) {
-  //   setTimeout(() => {
-  //     console.log('Delayed for 5 second.');
-  //     resolve(1);
-  //   }, 5000);
-  // });
-  console.log(upcomingMatches);
+  // console.log(upcomingMatches);
   const upcomingMatchesCount = Object.keys(upcomingMatches);
   noStore();
 
