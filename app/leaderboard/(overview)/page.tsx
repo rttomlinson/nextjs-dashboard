@@ -64,10 +64,12 @@ export default async function Page() {
                 }}
               >
                 <TableCell component="th" scope="row">
-                  {row.ranking}
+                  {row.isUser ? <b>{row.ranking + ' (You)'}</b> : <span>{row.ranking}</span>}
                 </TableCell>
                 <TableCell>{row.name}</TableCell>
-                <TableCell>${row.balance}</TableCell>
+                <TableCell>
+                  {(row.balance / 100).toLocaleString('en-US', { style: 'currency', currency: 'USD' })}
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
