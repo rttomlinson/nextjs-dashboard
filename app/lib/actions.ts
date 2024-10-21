@@ -403,6 +403,27 @@ export async function getUserBalance(userId) {
   }
 }
 
+export async function getAllBalances() {
+  const client = await pool.connect();
+
+  try {
+    const money = await client.query(
+      `
+        SELECT user_id, balance
+        FROM accounts
+        ORDER BY balance DESC
+        LIMIT 50
+        `
+    );
+    return money.rows;
+  } catch (error) {
+    console.error('Database error. Fetching balances:', error);
+    throw error;
+  } finally {
+    await client.release();
+  }
+}
+
 export async function login(formData: FormData) {
   const codeVerifier = base64URLEncode(crypto.randomBytes(32));
 
