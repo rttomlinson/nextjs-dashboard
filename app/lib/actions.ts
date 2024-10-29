@@ -173,6 +173,7 @@ type Match = {
   tournament_slug: string;
   scheduled_at: string;
   opponents: Team[];
+  fully_qualified_tournament_name: string;
 };
 
 type Team = {
@@ -194,22 +195,6 @@ export async function placeCounterStrikeBet(previousState: CounterStrikeBetState
   const userId = await getUserIdFromSessionId(sessionId.value);
 
   // Get matchInfo from "cache" (Need to consider how to make this a little better)
-  let upcomingMatch;
-  const client = await createRedisClient();
-  try {
-    await client.connect();
-    // If this value is null then something is wrong
-    upcomingMatch = (await client.json.get(process.env.UPCOMING_MATCHES_KEY, {
-      path: `$.${matchId}`
-    })) as Match[];
-    // If upcomingMatch length is not equal to 1 then something is wrong
-    upcomingMatch = upcomingMatch[0];
-  } catch (err) {
-    console.log(err);
-    throw err;
-  } finally {
-    await client.quit();
-  }
 
   const postgresClient = await pool.connect();
   try {
@@ -237,6 +222,27 @@ export async function placeCounterStrikeBet(previousState: CounterStrikeBetState
         message: 'You do not have enough funds to place this bet right now.'
       };
     }
+
+    // look for the match by id
+    const match = await postgresClient.query(
+      `SELECT upcoming_matches->$1 as match FROM upcoming_counterstrike_matches LIMIT 1;`,
+      [matchId]
+    );
+    if (match.rowCount == 0) {
+      // something is wrong with the db or the updating script
+      return {
+        errors: {
+          amount: [
+            `You tried to place a bet on a match that is no longer open. Try refreshing your page. Match with ID: ${matchId} is missing from UpcomingMatches table`
+          ]
+        },
+        message: `You tried to place a bet on a match that is no longer open. Try refreshing your page. Match with ID: ${matchId} is missing from UpcomingMatches table`
+      };
+      // TODO: Also send an audit log
+      // throw new Error(`Match with ID: ${matchId} is missing from UpcomingMatches table`);
+    }
+    let upcomingMatch: Match = match.rows[0]['match'];
+
     await postgresClient.query(
       `
         UPDATE accounts

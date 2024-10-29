@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 
 import UpcomingMatchesTable from '@/app/ui/counterstrike/place-bets-area';
 import { unstable_noStore as noStore } from 'next/cache';
-import { createRedisClient } from '@/app/lib/redisConnection';
+import { pool } from '@/app/lib/postgresConnection';
 
 export const metadata: Metadata = {
   title: 'CounterStrike'
@@ -24,18 +24,20 @@ export type Team = {
 };
 
 // Get upcoming matches
-
 async function getUpcomingSAndATierMatches() {
-  const redisClient = await createRedisClient();
+  const client = await pool.connect();
   try {
-    await redisClient.connect();
-    let upcomingMatches = (await redisClient.json.get(process.env.UPCOMING_MATCHES_KEY)) as { [key: string]: Match };
-    return upcomingMatches;
+    const matches = await client.query(`SELECT upcoming_matches FROM upcoming_counterstrike_matches LIMIT 1;`);
+    if (matches.rowCount == 0) {
+      // something is wrong with the db or the updating script
+      throw new Error('For some reason the upcoming_matches database is completely empty');
+    }
+    return matches.rows[0]['upcoming_matches'];
   } catch (err) {
     console.log(err);
     throw err;
   } finally {
-    await redisClient.quit();
+    await client.release();
   }
 }
 
