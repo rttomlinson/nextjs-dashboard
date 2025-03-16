@@ -18,9 +18,6 @@ export default function Login() {
         <Button variant="outlined" color="inherit" onClick={() => login(new FormData())}>
           Login
         </Button>
-        // <form action={login}>
-        //   <button type="submit">Login</button>
-        // </form>
       )}
     </section>
   );

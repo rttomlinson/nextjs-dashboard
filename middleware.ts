@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 const SESSION_ID_COOKIE_NAME = 'SESSION_ID';
-// This function can be marked `async` if using `await` inside
+
 export async function middleware(request: NextRequest) {
   const response = NextResponse.next();
 
@@ -17,7 +17,6 @@ export async function middleware(request: NextRequest) {
   console.log('hello middleware');
   return response;
 }
-
 // See "Matching Paths" below to learn more
 export const config = {
   matcher: [

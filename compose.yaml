@@ -10,3 +10,9 @@ services:
     environment:
       POSTGRES_USER: 'postgres'
       POSTGRES_PASSWORD: 'mysecretpassword'
+  openfga:
+    image: openfga/openfga
+    ports:
+      - '8080:8080'
+      - '9999:3000'
+    command: 'run'

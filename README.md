@@ -142,3 +142,30 @@ docker build -f Dockerfile.postgres -t bets-postgres .
 docker run --rm --hostname my-rabbit --name some-rabbit -p 5672:5672 rabbitmq:3
 
 https://github.com/auth0-samples/auth0-nextjs-samples/tree/main/Sample-01
+
+Auth options
+Session options
+
+---
+
+tmux setup
+
+tmux
+Ctrl + b + "
+Ctrl + b + "
+Ctrl + b + "
+
+Ctrl + b + (arrows) to move around
+
+docker logs -f bets-app-openfga-1
+docker logs -f bets-app-postgres-1
+docker logs -f bets-app-redis-1
+
+---
+
+/Documents/betting-app/bet-phase-updaters/liquibase
+liquibase update
+
+npm run dev-seed
+npm run locally-getCounterStrikeMatches
+npm run locally-updateCounterStrikeMatches

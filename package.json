@@ -5,6 +5,9 @@
   "scripts": {
     "dev": "concurrently \"next dev\" \"node api-server\"",
     "dev:api": "nodemon api-server",
+    "local:frontend": "node",
+    "local:api": "nodemon api-server",
+    "local:backend": "node",
     "build": "next build",
     "start": "concurrently \"next start\" \"node api-server\"",
     "start:api": "node api-server",
@@ -15,10 +18,6 @@
     "test-debug": "node --inspect tests/test.js",
     "cypress:run": "cypress run --browser chrome",
     "cypress:open": "cypress open --browser chrome",
-    "seed": "node -r dotenv/config ./scripts/seed.js",
-    "drop": "node -r dotenv/config ./scripts/drop.js",
-    "testseed": "node -r dotenv/config ./scripts/test-seed.ts",
-    "testdrop": "node -r dotenv/config ./scripts/test-drop.ts",
     "local-test": "jest tests/test.js",
     "local-test:watch": "jest tests/test.js --watch"
   },

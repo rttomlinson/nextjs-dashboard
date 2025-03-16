@@ -14,6 +14,7 @@ const { find } = require('geo-tz');
 const SESSION_ID_COOKIE_NAME = 'SESSION_ID';
 import { pool } from '@/app/lib/postgresConnection';
 import { createRedisClient } from '@/app/lib/redisConnection';
+import { createClient } from 'redis';
 
 // Need to verify that datetime is in the future
 const FormSchema = z.object({
@@ -276,6 +277,9 @@ export async function placeCounterStrikeBet(previousState: CounterStrikeBetState
         upcomingMatch.fully_qualified_tournament_name
       ]
     );
+
+    // Make calls to OpenFGA service to add relationships
+
     await postgresClient.query('COMMIT');
   } catch (error) {
     console.error(error);
@@ -431,10 +435,33 @@ export async function getAllBalances() {
 }
 
 export async function login(formData: FormData) {
-  const codeVerifier = base64URLEncode(crypto.randomBytes(32));
-
-  // Instead of storing this as a cookie, we should store it in the session data
   const cookieStore = cookies();
+
+  // Does a session already exist?
+  const sessionId = cookieStore.get('USER_SESSION_ID');
+  if (!(sessionId && sessionId.value != '')) {
+    // create a new session
+    const sessionId = crypto.randomUUID();
+    const redisClient = createClient({
+      url: process.env.KV_URL || 'redis://localhost:6379',
+      socket: {
+        tls: process.env.KV_USE_TLS ? true : false
+      }
+    });
+    redisClient.on('error', err => console.log('Redis Client Error', err));
+    await redisClient.connect();
+    await redisClient.hSet(sessionId, {
+      placeholder: 'banana'
+      // 'https://media.npr.org/assets/img/2023/01/14/this-is-fine_custom-dcb93e90c4e1548ffb16978a5a8d182270c872a9-s1100-c50.jpg'
+    });
+    const value = await redisClient.hGetAll(sessionId);
+    await redisClient.quit();
+
+    cookieStore.set('USER_SESSION_ID', sessionId);
+  }
+
+  const codeVerifier = base64URLEncode(crypto.randomBytes(32));
+  // Instead of storing this as a cookie, we should store it in the session data
   cookieStore.set('my_special_cookies_code_verifier', codeVerifier, {
     path: '/'
   });
@@ -557,3 +584,5 @@ export async function getUser() {
 export async function recordLocation(formData: FormData) {
   const rawFormData = {};
 }
+
+// verify jwt for session
