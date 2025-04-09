@@ -3,10 +3,14 @@ services:
     image: redis/redis-stack-server:latest
     ports:
       - '6379:6379'
+    volumes:
+      - redis_data:/data
   postgres:
     image: rttomlinson/bets-postgres
     ports:
       - '5432:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: 'postgres'
       POSTGRES_PASSWORD: 'mysecretpassword'
@@ -16,3 +20,7 @@ services:
       - '8080:8080'
       - '9999:3000'
     command: 'run'
+
+volumes:
+  pgdata:
+  redis_data:
