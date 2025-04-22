@@ -74,62 +74,65 @@ export default function Page() {
 
   const [caseWinner, setCaseWinner] = useState(null);
   const [accountBalance, setAccountBalance] = useState(null);
+  const [previousAccountBalance, setPreviousAccountBalance] = useState(null);
 
   let animationFrameId;
 
-  let image1Position = 384;
-  let image2Position = 0;
-  let image3Position = -384;
+  let image1Position = 0;
+  let image2Position = 384;
+  let image3Position = 768;
 
   let image1DisplayImage = 0;
   let image2DisplayImage = 1;
   let image3DisplayImage = 2;
 
   const draw = (ctx, images, step, displacement, positionValues) => {
+    // console.log('step', step);
+    // console.log('displacement', displacement);
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
-    image1Position = image1Position + step;
+    image1Position = image1Position - step;
 
-    image2Position = image2Position + step;
+    image2Position = image2Position - step;
 
-    image3Position = image3Position + step;
+    image3Position = image3Position - step;
 
-    if (displacement > 0) {
-      if (image1Position > viewWidth) {
-        let diff = image1Position - viewWidth; // How much further is it from the edge?
-        image1Position = -384 + diff;
+    if (step > 0) {
+      if (image1Position < -imagePixelWidth) {
+        let diff = -imagePixelWidth - image1Position; // How much further is it from the edge?
+        image1Position = 768 - diff;
         image1DisplayImage = image1DisplayImage + 3;
 
         // console.log('resetting image1');
-      } else if (image2Position > viewWidth) {
-        let diff = image2Position - viewWidth;
-        image2Position = -384 + diff;
+      } else if (image2Position < -imagePixelWidth) {
+        let diff = -imagePixelWidth - image2Position; // How much further is it from the edge?
+        image2Position = 768 - diff;
         image2DisplayImage = image2DisplayImage + 3;
 
         // console.log('resetting image2');
-      } else if (image3Position > viewWidth) {
-        let diff = image3Position - viewWidth;
-        image3Position = -384 + diff;
+      } else if (image3Position < -imagePixelWidth) {
+        let diff = -imagePixelWidth - image3Position; // How much further is it from the edge?
+        image3Position = 768 - diff;
         image3DisplayImage = image3DisplayImage + 3;
 
         // console.log('resetting image3');
       }
     } else {
-      if (image1Position < -imagePixelWidth) {
-        let diff = -imagePixelWidth - image1Position;
-        image1Position = viewWidth - diff;
+      if (image1Position > viewWidth) {
+        let diff = image1Position - viewWidth;
+        image1Position = -imagePixelWidth + diff;
         image1DisplayImage = image1DisplayImage - 3;
 
         // console.log('opposite resetting image1');
-      } else if (image2Position < -imagePixelWidth) {
-        let diff = -imagePixelWidth - image2Position;
-        image2Position = viewWidth - diff;
+      } else if (image2Position > viewWidth) {
+        let diff = image2Position - viewWidth;
+        image2Position = -imagePixelWidth + diff;
         image2DisplayImage = image2DisplayImage - 3;
 
         // console.log('opposite resetting image2');
-      } else if (image3Position < -imagePixelWidth) {
-        let diff = -imagePixelWidth - image3Position;
-        image3Position = viewWidth - diff;
+      } else if (image3Position > viewWidth) {
+        let diff = image3Position - viewWidth;
+        image3Position = -imagePixelWidth + diff;
         image3DisplayImage = image3DisplayImage - 3;
 
         // console.log('opposite resetting image3');
@@ -137,24 +140,42 @@ export default function Page() {
     }
 
     // This is where to start drawing
-    let image1Image = images[positionValues[image1DisplayImage < 0 ? 0 : image1DisplayImage]]['image'];
-    let image1FillStyle = images[positionValues[image1DisplayImage < 0 ? 0 : image1DisplayImage]]['fillStyle'];
+    let image1Image =
+      images[
+        positionValues[image1DisplayImage < 0 || image1DisplayImage >= positionValues.length ? 0 : image1DisplayImage]
+      ]['image'];
+    let image1FillStyle =
+      images[
+        positionValues[image1DisplayImage < 0 || image1DisplayImage >= positionValues.length ? 0 : image1DisplayImage]
+      ]['fillStyle'];
 
     ctx.fillStyle = image1FillStyle;
     ctx.fillRect(image1Position, 0, imagePixelWidth, imagePixelHeight);
     ctx.strokeRect(image1Position, 0, imagePixelWidth, imagePixelHeight);
     ctx.drawImage(image1Image, image1Position, 0);
 
-    let image2Image = images[positionValues[image2DisplayImage < 0 ? 0 : image2DisplayImage]]['image'];
-    let image2FillStyle = images[positionValues[image2DisplayImage < 0 ? 0 : image2DisplayImage]]['fillStyle'];
+    let image2Image =
+      images[
+        positionValues[image2DisplayImage < 0 || image2DisplayImage >= positionValues.length ? 0 : image2DisplayImage]
+      ]['image'];
+    let image2FillStyle =
+      images[
+        positionValues[image2DisplayImage < 0 || image2DisplayImage >= positionValues.length ? 0 : image2DisplayImage]
+      ]['fillStyle'];
 
     ctx.fillStyle = image2FillStyle;
     ctx.fillRect(image2Position, 0, imagePixelWidth, imagePixelHeight);
     ctx.strokeRect(image2Position, 0, imagePixelWidth, imagePixelHeight);
     ctx.drawImage(image2Image, image2Position, 0);
 
-    let image3Image = images[positionValues[image3DisplayImage < 0 ? 0 : image3DisplayImage]]['image'];
-    let image3FillStyle = images[positionValues[image3DisplayImage < 0 ? 0 : image3DisplayImage]]['fillStyle'];
+    let image3Image =
+      images[
+        positionValues[image3DisplayImage < 0 || image3DisplayImage >= positionValues.length ? 0 : image3DisplayImage]
+      ]['image'];
+    let image3FillStyle =
+      images[
+        positionValues[image3DisplayImage < 0 || image3DisplayImage >= positionValues.length ? 0 : image3DisplayImage]
+      ]['fillStyle'];
     ctx.fillStyle = image3FillStyle;
     ctx.fillRect(image3Position, 0, imagePixelWidth, imagePixelHeight);
     ctx.strokeRect(image3Position, 0, imagePixelWidth, imagePixelHeight);
@@ -290,7 +311,7 @@ export default function Page() {
       console.log('You won: ', caseWinner);
       // make API call to get winner?
 
-      animate(context, frameCount, images, durationCounter + durationCounterOffset, positionValues);
+      animate(context, frameCount, images, totalAnimateRefreshes, positionValues);
     } else if (animationState == 0) {
       console.log('calling animationState for 0');
     }
