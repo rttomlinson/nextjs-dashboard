@@ -15,7 +15,7 @@ import desolateSpaceM4a4 from '../../../public/desolate_space_m4a4.png';
 import thorNegev from '../../../public/thor_negev.png';
 
 // TODO: env var
-const BACKEND_SERVER_URL = 'http://localhost:3000/api/cases';
+const BACKEND_SERVER_URL = process.env.CASES_API_SERVER_URL || 'http://localhost:3000/api/cases';
 
 // const skins = [
 //   'broken_fang_case',
