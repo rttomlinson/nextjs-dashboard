@@ -75,6 +75,10 @@ export default function Page() {
   const [caseWinner, setCaseWinner] = useState(null);
   const [accountBalance, setAccountBalance] = useState(null);
   const [previousAccountBalance, setPreviousAccountBalance] = useState(null);
+  const [newAccountBalance, setNewAccountBalance] = useState(null);
+  const [newCaseWinner, setNewCaseWinner] = useState(null);
+
+  const [spinsHistory, setSpinsHistory] = useState([]);
 
   let animationFrameId;
 
@@ -202,6 +206,9 @@ export default function Page() {
     if (frameCount > durationCounter) {
       setAnimationState(0);
       console.log('finished drawing');
+      // update the winner values
+      setNewAccountBalance(accountBalance);
+      setNewCaseWinner(caseWinner);
       return;
     }
 
@@ -323,57 +330,70 @@ export default function Page() {
   }, [animationState]);
 
   return (
-    <div style={{ display: 'flex' }}>
-      <SlotWindow>
-        <div
-          id="reel1"
-          // ref={yourRef}
-          style={{
-            width: `${viewWidth}px`,
-            borderStyle: 'solid'
-            // backgroundImage: `url(${bg.src})`,
-            // backgroundSize: 'cover',
-            // backgroundRepeat: 'repeat-y',
-            // width: '100px',
-            // ...reelStyle1
-          }}
-        >
-          <canvas ref={canvasRef} width={imagePixelWidth * 2} height={288} style={{ position: 'absolute' }}></canvas>
-          <canvas
-            ref={lineCanvasRef}
-            width={imagePixelWidth * 2}
-            height={288}
-            style={{ position: 'absolute' }}
-          ></canvas>
-        </div>
-      </SlotWindow>
-      <Box>
-        <button
-          onClick={() => {
-            if (animationState == 1) {
-              setAnimationState(0);
-            }
-            if (animationState == 0) {
-              if (canvasRef == undefined || lineCanvasRef == undefined) {
-                return;
+    <div>
+      <div style={{ display: 'flex' }}>
+        <SlotWindow>
+          <div
+            id="reel1"
+            // ref={yourRef}
+            style={{
+              width: `${viewWidth}px`,
+              borderStyle: 'solid'
+              // backgroundImage: `url(${bg.src})`,
+              // backgroundSize: 'cover',
+              // backgroundRepeat: 'repeat-y',
+              // width: '100px',
+              // ...reelStyle1
+            }}
+          >
+            <canvas ref={canvasRef} width={imagePixelWidth * 2} height={288} style={{ position: 'absolute' }}></canvas>
+            <canvas
+              ref={lineCanvasRef}
+              width={imagePixelWidth * 2}
+              height={288}
+              style={{ position: 'absolute' }}
+            ></canvas>
+          </div>
+        </SlotWindow>
+        <Box>
+          <button
+            onClick={() => {
+              if (animationState == 1) {
+                setAnimationState(0);
               }
-              // make network call
-              fetch(BACKEND_SERVER_URL)
-                .then(response => response.json())
-                .then(json => {
-                  console.log(json);
-                  setCaseWinner(json['result']);
-                  setAccountBalance(json['accountBalance']);
-                  setAnimationState(1);
-                })
-                .catch(e => console.error(e));
-            }
-          }}
-        >
-          Spin
-        </button>
-        <div>Account balance: ${accountBalance / 100}</div>
-      </Box>
+              if (animationState == 0) {
+                if (canvasRef == undefined || lineCanvasRef == undefined) {
+                  return;
+                }
+                // reset states
+                setNewCaseWinner('-');
+                setPreviousAccountBalance(accountBalance - 500);
+
+                // make network call
+                fetch(BACKEND_SERVER_URL)
+                  .then(response => response.json())
+                  .then(json => {
+                    console.log(json);
+                    setCaseWinner(json['result']);
+                    setAccountBalance(json['accountBalance']);
+                    // setPreviousAccountBalance(accountBalance);
+                    setAnimationState(1);
+                  })
+                  .catch(e => console.error(e));
+              }
+            }}
+          >
+            Spin
+          </button>
+        </Box>
+      </div>
+      <div>
+        {previousAccountBalance ? <div>Previous balance: ${previousAccountBalance / 100}</div> : <></>}
+        {caseWinner !== '-' || caseWinner != null ? <div>Case winnings: ${skinsToAmount[caseWinner]}</div> : <></>}
+
+        <div>Account balance: ${newAccountBalance / 100}</div>
+        <div>You won: {newCaseWinner}</div>
+      </div>
     </div>
   );
 }
