@@ -14,57 +14,9 @@ import timezone from 'dayjs/plugin/timezone';
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-// This is also consistent with order for now
-const skins = [
-  'broken_fang_case',
-  'imperial_plaid_gloves',
-  'atheris_awp',
-  'asiimov_ak',
-  'lore_bayonet_knife',
-  'stonewash_bayonet_knife',
-  'printstream_deagle',
-  'pulse_famas',
-  'desolate_space_m4a4',
-  'thor_negev'
-];
+import { cases, skins, blue, purple, pink, red, gold } from '@/public/data/revolution.js';
 
-// winnings in cents
-const skinsToAmount = {
-  broken_fang_case: 100,
-  imperial_plaid_gloves: 20000,
-  atheris_awp: 2000,
-  asiimov_ak: 5000,
-  lore_bayonet_knife: 15000,
-  stonewash_bayonet_knife: 10000,
-  printstream_deagle: 1500,
-  pulse_famas: 1000,
-  desolate_space_m4a4: 1000,
-  thor_negev: 1000
-};
-
-const DEFAULT_WEIGHTS = x => {
-  if (x < 0.75) {
-    return 'broken_fang_case';
-  } else if (x >= 0.75 && x < 0.8) {
-    return 'atheris_awp';
-  } else if (x >= 0.8 && x < 0.82) {
-    return 'imperial_plaid_gloves';
-  } else if (x >= 0.82 && x < 0.84) {
-    return 'asiimov_ak';
-  } else if (x >= 0.84 && x < 0.86) {
-    return 'lore_bayonet_knife';
-  } else if (x >= 0.86 && x < 0.88) {
-    return 'stonewash_bayonet_knife';
-  } else if (x >= 0.88 && x < 0.9) {
-    return 'printstream_deagle';
-  } else if (x >= 0.9 && x < 0.92) {
-    return 'pulse_famas';
-  } else if (x >= 0.92 && x < 0.94) {
-    return 'desolate_space_m4a4';
-  } else if (x >= 0.94 && x < 1) {
-    return 'thor_negev';
-  }
-};
+import { DEFAULT_WEIGHTS } from '@/public/data/weights.js';
 
 async function getSessionData(sessionId) {
   try {
@@ -99,8 +51,8 @@ async function spinCases(userId) {
           `,
       [userId]
     );
-    // default cost to spin is $5 USD
-    const betAmount = 5;
+    // default cost to open a case is $2.5 USD
+    const betAmount = 2.5;
     const betAmountInCents = betAmount * 100;
     const balance = account.rows[0].balance;
     if (balance < betAmountInCents) {
@@ -112,9 +64,15 @@ async function spinCases(userId) {
     console.log('input weight: ', weightFunction);
     let result = DEFAULT_WEIGHTS(weightFunction);
 
-    let amountWinnings = skinsToAmount[result];
+    // Get the skin from the skins object
+    let skinsPool = skins[result];
 
-    let netWinnings = amountWinnings - betAmountInCents;
+    let skin = skinsPool[Math.floor(Math.random() * skinsPool.length)];
+
+    let skinValue = skin.value;
+    let amountWinnings = skinValue;
+
+    // let netWinnings = amountWinnings - betAmountInCents;
 
     await postgresClient.query(
       `
@@ -122,11 +80,20 @@ async function spinCases(userId) {
           SET balance=$1
           WHERE user_id=$2;
           `,
-      [balance + netWinnings, userId]
+      [balance - betAmountInCents, userId]
     );
 
     const now = dayjs.utc();
 
+    // also insert into inventory
+    // need to create inventory table
+    // await postgresClient.query(
+    //   `
+    //       INSERT INTO inventory(user_id, skin_id, date)
+    //       VALUES           ($1, $2, $3);
+    //       `,
+    //   [userId, skinKey, now.toISOString()]
+    // );
     await postgresClient.query(
       `
           INSERT INTO case_spins(user_id, outcome, date)
@@ -138,7 +105,7 @@ async function spinCases(userId) {
     // Make calls to OpenFGA service to add relationships
 
     await postgresClient.query('COMMIT');
-    return { result: result, accountBalance: balance + netWinnings };
+    return { result: result, accountBalance: balance - betAmountInCents };
   } catch (error) {
     console.error(error);
     await postgresClient.query('ROLLBACK');
@@ -176,7 +143,7 @@ export async function GET(request: NextRequest) {
 
   try {
     // check if they have money
-    const COST_TO_SPIN = 5;
+    const COST_TO_SPIN = 2.5;
     if (userBalance < COST_TO_SPIN) {
       return NextResponse.json({ error: 'INCIFFICIENT_FUNDS' }, { status: 400 });
     }

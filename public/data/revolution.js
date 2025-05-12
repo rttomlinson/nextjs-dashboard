@@ -1,0 +1,197 @@
+export const cases = [
+  {
+    name: 'Revolution Case',
+    image: 'case1',
+    id: '1'
+  }
+];
+
+import gold1 from '../../public/revolution/gold/imperial_plaid_gloves.png';
+
+export const blue = [
+  {
+    name: 'MAG-7 Insomnia',
+    image: 'blue1',
+    fillStyle: 'rgb(77, 121, 255)',
+    value: 25,
+    rarity: 'blue',
+    caseId: '1',
+    id: '1'
+  },
+  {
+    name: 'MP5-SD Quick Liquidation',
+    image: 'blue2',
+    fillStyle: 'rgb(77, 121, 255)',
+    value: 25,
+    rarity: 'blue',
+    caseId: '1',
+    id: '2'
+  },
+  {
+    name: 'MP9 Superlight',
+    image: 'blue3',
+    fillStyle: 'rgb(77, 121, 255)',
+    value: 25,
+    rarity: 'blue',
+    caseId: '1',
+    id: '3'
+  },
+  {
+    name: 'SCAR-20 Fragments',
+    image: 'blue4',
+    fillStyle: 'rgb(77, 121, 255)',
+    value: 25,
+    rarity: 'blue',
+    caseId: '1',
+    id: '4'
+  },
+  {
+    name: 'SG553 Cyberforce',
+    image: 'blue5',
+    fillStyle: 'rgb(77, 121, 255)',
+    value: 25,
+    rarity: 'blue',
+    caseId: '1',
+    id: '5'
+  },
+  {
+    name: 'Tec-9 Freedom',
+    image: 'blue6',
+    fillStyle: 'rgb(77, 121, 255)',
+    value: 25,
+    rarity: 'blue',
+    caseId: '1',
+    id: '6'
+  }
+];
+
+export const purple = [
+  {
+    name: 'Glock Moon Rabbit',
+    image: 'purple1',
+    fillStyle: 'rgb(213, 128, 255)',
+    value: 90,
+    rarity: 'purple',
+    caseId: '1',
+    id: '7'
+  },
+  {
+    name: 'M4A1-S Feeding Frenzy',
+    image: 'purple2',
+    fillStyle: 'rgb(213, 128, 255)',
+    value: 90,
+    rarity: 'purple',
+    caseId: '1',
+    id: '8'
+  },
+  {
+    name: 'MAC-10 Sakkaku',
+    image: 'purple3',
+    fillStyle: 'rgb(213, 128, 255)',
+    value: 90,
+    rarity: 'purple',
+    caseId: '1',
+    id: '9'
+  },
+  {
+    name: 'P90 Neoqueen',
+    image: 'purple4',
+    fillStyle: 'rgb(213, 128, 255)',
+    value: 90,
+    rarity: 'purple',
+    caseId: '1',
+    id: '10'
+  },
+  {
+    name: 'R8 Banana',
+    image: 'purple5',
+    fillStyle: 'rgb(213, 128, 255)',
+    value: 90,
+    rarity: 'purple',
+    caseId: '1',
+    id: '11'
+  }
+];
+
+export const pink = [
+  {
+    name: 'AWP Limbo Snake',
+    image: 'pink1',
+    fillStyle: 'rgb(255, 77, 255)',
+    value: 160,
+    rarity: 'pink',
+    caseId: '1',
+    id: '12'
+  },
+  {
+    name: 'P2000 Decline',
+    image: 'pink2',
+    fillStyle: 'rgb(255, 77, 255)',
+    value: 160,
+    rarity: 'pink',
+    caseId: '1',
+    id: '13'
+  },
+  {
+    name: 'UMP Clutch Kick',
+    image: 'pink3',
+    fillStyle: 'rgb(255, 77, 255)',
+    value: 160,
+    rarity: 'pink',
+    caseId: '1',
+    id: '14'
+  }
+];
+
+export const red = [
+  {
+    name: 'AK-47 Head Shot',
+    image: 'red1',
+    fillStyle: 'rgb(255, 51, 51)',
+    value: 1300,
+    rarity: 'red',
+    caseId: '1',
+    id: '15'
+  },
+  {
+    name: 'M4A4 Temukau',
+    image: 'red2',
+    fillStyle: 'rgb(255, 51, 51)',
+    value: 2300,
+    rarity: 'red',
+    caseId: '1',
+    id: '16'
+  }
+];
+
+export const gold = [
+  {
+    name: 'Imperial Plaid Gloves',
+    image: 'gold1',
+    fillStyle: 'rgb(255, 209, 26)',
+    value: 25000,
+    rarity: 'gold',
+    caseId: '1',
+    id: '17'
+  },
+  {
+    name: 'Lore Bayonet Knife',
+    image: 'gold2',
+    fillStyle: 'rgb(255, 209, 26)',
+    value: 17000,
+    rarity: 'gold',
+    caseId: '1',
+    id: '18'
+  },
+  {
+    name: 'Stonewash Bayonet Knife',
+    image: 'gold3',
+    fillStyle: 'rgb(255, 209, 26)',
+    value: 10000,
+    rarity: 'gold',
+    caseId: '1',
+    id: '19'
+  }
+];
+
+export const skins = [...blue, ...purple, ...pink, ...red, ...gold];

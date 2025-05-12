@@ -2,6 +2,9 @@ import pg from 'pg';
 import dayjs from 'dayjs';
 import axios from 'axios';
 var utc = require('dayjs/plugin/utc');
+import { DEFAULT_WEIGHTS } from '@/public/data/weights.js';
+import { blue, purple, pink, red, gold } from '@/public/data/revolution.js';
+
 dayjs.extend(utc);
 
 // import { seed } from '../scripts/test-seed';
@@ -46,13 +49,27 @@ test('is just testing something', async () => {
     database: 'postgres'
   });
   try {
-    const currentTime = dayjs.utc();
-    const startOfDay = dayjs.utc().startOf('day');
-    // get the start of the day
-    const response = axios.get('https://api.pandascore.co/csgo/matches/upcoming?sort=scheduled_at', {
-      headers: { Authorization: 'Bearer A1Nb8RYRdkN5TWaPTuxFmrY0f_Ya0FiI2-IZ_CDG0XIM_IKb3PE' }
-    });
-    console.log();
+    let weightFunction = Math.random();
+    let color = DEFAULT_WEIGHTS(weightFunction);
+    let skin;
+
+    if (color === 'blue') {
+      skin = blue[Math.floor(Math.random() * blue.length)];
+    }
+    if (color === 'purple') {
+      skin = purple[Math.floor(Math.random() * purple.length)];
+    }
+    if (color === 'pink') {
+      skin = pink[Math.floor(Math.random() * pink.length)];
+    }
+    if (color === 'red') {
+      skin = red[Math.floor(Math.random() * red.length)];
+    }
+    if (color === 'gold') {
+      skin = gold[Math.floor(Math.random() * gold.length)];
+    }
+    console.log(skin);
+
     // throw error if rowCount is not 1
   } catch (err) {
     console.error(err);
