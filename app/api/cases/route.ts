@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// import React from 'react';
 import { cookies } from 'next/headers';
 import { unstable_noStore } from 'next/cache';
 
@@ -62,17 +61,32 @@ async function spinCases(userId) {
     // Get the next skin
     let weightFunction = Math.random();
     console.log('input weight: ', weightFunction);
-    let result = DEFAULT_WEIGHTS(weightFunction);
+    let color = DEFAULT_WEIGHTS(weightFunction);
 
     // Get the skin from the skins object
-    let skinsPool = skins[result];
+    let skin;
 
-    let skin = skinsPool[Math.floor(Math.random() * skinsPool.length)];
+    if (color === 'blue') {
+      skin = blue[Math.floor(Math.random() * blue.length)];
+    }
+    if (color === 'purple') {
+      skin = purple[Math.floor(Math.random() * purple.length)];
+    }
+    if (color === 'pink') {
+      skin = pink[Math.floor(Math.random() * pink.length)];
+    }
+    if (color === 'red') {
+      skin = red[Math.floor(Math.random() * red.length)];
+    }
+    if (color === 'gold') {
+      skin = gold[Math.floor(Math.random() * gold.length)];
+    }
+    console.log(skin);
 
     let skinValue = skin.value;
     let amountWinnings = skinValue;
 
-    // let netWinnings = amountWinnings - betAmountInCents;
+    let newBalance = balance - betAmountInCents;
 
     await postgresClient.query(
       `
@@ -80,32 +94,31 @@ async function spinCases(userId) {
           SET balance=$1
           WHERE user_id=$2;
           `,
-      [balance - betAmountInCents, userId]
+      [newBalance, userId]
     );
 
     const now = dayjs.utc();
 
     // also insert into inventory
-    // need to create inventory table
-    // await postgresClient.query(
-    //   `
-    //       INSERT INTO inventory(user_id, skin_id, date)
-    //       VALUES           ($1, $2, $3);
-    //       `,
-    //   [userId, skinKey, now.toISOString()]
-    // );
     await postgresClient.query(
       `
-          INSERT INTO case_spins(user_id, outcome, date)
+          INSERT INTO user_skins_inventory(user_id, skin_id, date)
           VALUES           ($1, $2, $3);
           `,
-      [userId, result, now.toISOString()]
+      [userId, skin['id'], now.toISOString()]
+    );
+    await postgresClient.query(
+      `
+          INSERT INTO case_spins(user_id, outcome, date, skin_id)
+          VALUES           ($1, $2, $3, $4);
+          `,
+      [userId, skin['id'], now.toISOString(), skin['id']]
     );
 
     // Make calls to OpenFGA service to add relationships
 
     await postgresClient.query('COMMIT');
-    return { result: result, accountBalance: balance - betAmountInCents };
+    return { result: skin, accountBalance: newBalance };
   } catch (error) {
     console.error(error);
     await postgresClient.query('ROLLBACK');

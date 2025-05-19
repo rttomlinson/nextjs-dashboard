@@ -7,67 +7,7 @@ import { useRef, useEffect, useState } from 'react';
 
 import { cases, skins, blue, purple, pink, red, gold } from '@/public/data/revolution.js';
 
-import case1 from '../../public/revolution/case/crate_community_32.png';
-
-import blue1 from '../../public/revolution/blue/weapon_mag7_cu_mag7_insomnia_light.png';
-import blue2 from '../../public/revolution/blue/weapon_mp5sd_cu_mp5sd_quick_liquidation_light.png';
-import blue3 from '../../public/revolution/blue/weapon_mp9_cu_mp9_superlight_light.png';
-import blue4 from '../../public/revolution/blue/weapon_scar20_gs_scar_fragments_black_light.png';
-import blue5 from '../../public/revolution/blue/weapon_sg556_cu_sg553_cyberforce_light.png';
-import blue6 from '../../public/revolution/blue/weapon_tec9_cu_tec9_freedom_light.png';
-
-import purple1 from '../../public/revolution/purple/weapon_glock_cu_glock_moon_rabbit_light.png';
-import purple2 from '../../public/revolution/purple/weapon_m4a1_silencer_cu_m4a1s_feeding_frenzy_light.png';
-import purple3 from '../../public/revolution/purple/weapon_mac10_cu_mac10_sakkaku_light.png';
-import purple4 from '../../public/revolution/purple/weapon_p90_gs_p90_neoqueen_light.png';
-import purple5 from '../../public/revolution/purple/weapon_revolver_gs_r8_banana_light.png';
-
-import pink1 from '../../public/revolution/pink/weapon_awp_gs_awp_limbo_snake_light.png';
-import pink2 from '../../public/revolution/pink/weapon_hkp2000_cu_p2000_decline_light.png';
-import pink3 from '../../public/revolution/pink/weapon_ump45_cu_ump_clutch_kick_light.png';
-
-import red1 from '../../public/revolution/red/weapon_ak47_cu_ak_head_shot_holo_light.png';
-import red2 from '../../public/revolution/red/weapon_m4a1_cu_m4a4_temukau_light.png';
-
-import gold1 from '../../public/revolution/gold/imperial_plaid_gloves.png';
-import gold2 from '../../public/revolution/gold/lore_bayonet_knife.png';
-import gold3 from '../../public/revolution/gold/stonewash_bayonet_knife.png';
-
-const skin = {
-  'MAG-7 Insomnia': { imageSrc: blue1 },
-  'MP5-SD Quick Liquidation': { imageSrc: blue2 },
-  'MP9 Superlight': { imageSrc: blue3 },
-  'SCAR-20 Fragments': { imageSrc: blue4 },
-  'SG553 Cyberforce': { imageSrc: blue5 },
-  'Tec-9 Freedom': { imageSrc: blue6 },
-  'Glock Moon Rabbit': { imageSrc: purple1 },
-  'M4A1-S Feeding Frenzy': { imageSrc: purple2 },
-  'MAC-10 Sakkaku': { imageSrc: purple3 },
-  'P90 Neoqueen': { imageSrc: purple4 },
-  'R8 Banana': { imageSrc: purple5 },
-  'AWP Limbo Snake': { imageSrc: pink1 },
-  'P2000 Decline': { imageSrc: pink2 },
-  'UMP Clutch Kick': { imageSrc: pink3 },
-  'AK-47 Head Shot': { imageSrc: red1 },
-  'M4A4 Temukau': { imageSrc: red2 },
-  'Imperial Plaid Gloves': { imageSrc: gold1 },
-  'Lore Bayonet Knife': { imageSrc: gold2 },
-  'Stonewash Bayonet Knife': { imageSrc: gold3 }
-};
 const BACKEND_SERVER_URL = process.env.NEXT_PUBLIC_CASES_API_SERVER_URL || 'http://localhost:3000/api/cases';
-
-const skinsToAmount = {
-  broken_fang_case: 1,
-  imperial_plaid_gloves: 200,
-  atheris_awp: 20,
-  asiimov_ak: 50,
-  lore_bayonet_knife: 150,
-  stonewash_bayonet_knife: 100,
-  printstream_deagle: 15,
-  pulse_famas: 10,
-  desolate_space_m4a4: 10,
-  thor_negev: 10
-};
 
 const SlotWindow = styled('div')({
   height: '288px',
@@ -127,6 +67,8 @@ export default function Cases({ userBalance }) {
     image2Position = image2Position - step;
     image3Position = image3Position - step;
 
+    // console.log(positionValues);
+
     if (step > 0) {
       if (image1Position < -imagePixelWidth) {
         let diff = -imagePixelWidth - image1Position; // How much further is it from the edge?
@@ -161,7 +103,7 @@ export default function Cases({ userBalance }) {
     let image1Image =
       images[
         positionValues[image1DisplayImage < 0 || image1DisplayImage >= positionValues.length ? 0 : image1DisplayImage]
-      ]['image'];
+      ]['canvasImage'];
     let image1FillStyle =
       images[
         positionValues[image1DisplayImage < 0 || image1DisplayImage >= positionValues.length ? 0 : image1DisplayImage]
@@ -175,7 +117,7 @@ export default function Cases({ userBalance }) {
     let image2Image =
       images[
         positionValues[image2DisplayImage < 0 || image2DisplayImage >= positionValues.length ? 0 : image2DisplayImage]
-      ]['image'];
+      ]['canvasImage'];
     let image2FillStyle =
       images[
         positionValues[image2DisplayImage < 0 || image2DisplayImage >= positionValues.length ? 0 : image2DisplayImage]
@@ -189,7 +131,7 @@ export default function Cases({ userBalance }) {
     let image3Image =
       images[
         positionValues[image3DisplayImage < 0 || image3DisplayImage >= positionValues.length ? 0 : image3DisplayImage]
-      ]['image'];
+      ]['canvasImage'];
     let image3FillStyle =
       images[
         positionValues[image3DisplayImage < 0 || image3DisplayImage >= positionValues.length ? 0 : image3DisplayImage]
@@ -229,7 +171,10 @@ export default function Cases({ userBalance }) {
       // Dont love modifying an object
       //   .slice(-1)[0]
       spinsHistory[spinsHistory.length - 1]['currentBalance'] = accountBalance;
-      spinsHistory[spinsHistory.length - 1]['winnings'] = skinsToAmount[caseWinner] * 100;
+
+      // skinsToAmount[caseWinner]
+      spinsHistory[spinsHistory.length - 1]['winnings'] = 0 * 100;
+
       spinsHistory[spinsHistory.length - 1]['skin'] = caseWinner;
 
       setSpinsHistory(spinsHistory);
@@ -270,36 +215,16 @@ export default function Cases({ userBalance }) {
 
     let images = {};
 
-    blue.forEach((blueSkin, index) => {
-      const blueImage = new Image();
-      blueImage.src = skinImages[blueSkin.name].src;
-      images[blueSkin.name] = { image: blueImage, fillStyle: 'rgb(77, 121, 255)' };
-    });
-    purple.forEach((purple, index) => {
-      const purpleImage = new Image();
-      purpleImage.src = purple.image.src;
-      images[purple.name] = { image: purpleImage, fillStyle: 'rgb(213, 128, 255)' };
-    });
-    pink.forEach((pink, index) => {
-      const pinkImage = new Image();
-      pinkImage.src = pink.image.src;
-      images[pink.name] = { image: pinkImage, fillStyle: 'rgb(255, 77, 255)' };
-    });
-    red.forEach((red, index) => {
-      const redImage = new Image();
-      redImage.src = red.image.src;
-      images[red.name] = { image: redImage, fillStyle: 'rgb(255, 51, 51)' };
-    });
-    gold.forEach((gold, index) => {
-      const goldImage = new Image();
-      goldImage.src = gold.image.src;
-      images[gold.name] = { image: goldImage, fillStyle: 'rgb(255, 209, 26)' };
+    skins.forEach((skin, index) => {
+      const skinImage = new Image();
+      skinImage.src = skin.image.src;
+      images[skin.name] = { canvasImage: skinImage, ...skin };
     });
 
-    const caseImage = new Image();
-    caseImage.src = case1.src;
+    // const caseImage = new Image();
+    // caseImage.src = cases[0].src;
 
-    images['case_revolution'] = { image: caseImage, fillStyle: 'rgb(236, 217, 198)' };
+    // images['case_revolution'] = { image: caseImage, fillStyle: 'rgb(236, 217, 198)' };
 
     ////////////////////////
 
@@ -312,34 +237,38 @@ export default function Cases({ userBalance }) {
       let winnerPosition = Math.floor(totalPixelsMoved / imagePixelWidth) + 1;
       let maximumImageMoved = winnerPosition + 3; // maximum
 
-      let positionValues = Array(maximumImageMoved).fill('broken_fang_case');
+      let positionValues = Array(maximumImageMoved).fill(undefined);
 
       // skinsRandomizer
       const weights = x => {
         if (x < 0.75) {
-          return 'broken_fang_case';
+          return 'blue';
         } else if (x >= 0.75 && x < 0.8) {
-          return 'atheris_awp';
+          return 'purple';
         } else if (x >= 0.8 && x < 0.82) {
-          return 'imperial_plaid_gloves';
+          return 'pink';
         } else if (x >= 0.82 && x < 0.84) {
-          return 'asiimov_ak';
-        } else if (x >= 0.84 && x < 0.86) {
-          return 'lore_bayonet_knife';
-        } else if (x >= 0.86 && x < 0.88) {
-          return 'stonewash_bayonet_knife';
-        } else if (x >= 0.88 && x < 0.9) {
-          return 'printstream_deagle';
-        } else if (x >= 0.9 && x < 0.92) {
-          return 'pulse_famas';
-        } else if (x >= 0.92 && x < 0.94) {
-          return 'desolate_space_m4a4';
-        } else if (x >= 0.94 && x < 1) {
-          return 'thor_negev';
+          return 'red';
+        } else if (x >= 0.84 && x < 1) {
+          return 'gold';
         }
       };
       positionValues = positionValues.map(() => {
-        return weights(Math.random());
+        const color = weights(Math.random());
+        if (color === 'blue') {
+          return blue[Math.floor(Math.random() * blue.length)].name;
+        }
+        if (color === 'purple') {
+          return purple[Math.floor(Math.random() * purple.length)].name;
+        }
+        if (color === 'pink') {
+          return pink[Math.floor(Math.random() * pink.length)].name;
+        }
+        if (color === 'red') {
+          return red[Math.floor(Math.random() * red.length)].name;
+        } else if (color === 'gold') {
+          return gold[Math.floor(Math.random() * gold.length)].name;
+        }
       });
 
       positionValues[winnerPosition] = caseWinner;
@@ -412,8 +341,9 @@ export default function Cases({ userBalance }) {
                   return;
                 }
                 // reset states
+                const costPerKey = 250; // cents
 
-                setGlobalAccountBalance(accountBalance - 500);
+                setGlobalAccountBalance(accountBalance - costPerKey);
 
                 setIsBlinking(1);
 
@@ -431,7 +361,7 @@ export default function Cases({ userBalance }) {
                   .then(response => response.json())
                   .then(json => {
                     console.log(json);
-                    setCaseWinner(json['result']);
+                    setCaseWinner(json['result']['name']);
                     setAccountBalance(json['accountBalance']);
                     // setPreviousAccountBalance(accountBalance);
                     setAnimationState(1);
@@ -461,38 +391,7 @@ export default function Cases({ userBalance }) {
           .slice()
           .reverse()
           .map((spin, idx) => (
-            <div>
-              <div>Previous balance: ${spin['previousBalance'] / 100}</div>
-              <div>Spin cost: ${spin['spinCost'] / 100}</div>
-
-              <div>
-                Winnings:{' '}
-                <span
-                  style={
-                    isBlinking && idx == 0 ? { opacity: 1, animation: 'blink 1s ease-in-out infinite' } : { opacity: 1 }
-                  }
-                >
-                  ${spin['winnings'] ? spin['winnings'] / 100 : 'pending'}
-                </span>
-              </div>
-              <div>
-                Diff:{' '}
-                {spin['winnings'] && spin['spinCost']
-                  ? spin['winnings'] - spin['spinCost'] < 0
-                    ? `-\$${Math.abs((spin['winnings'] - spin['spinCost']) / 100)}`
-                    : `\$${(spin['winnings'] - spin['spinCost']) / 100}`
-                  : null}
-              </div>
-              <div>
-                New account balance:{' '}
-                <span
-                  style={
-                    isBlinking && idx == 0 ? { opacity: 1, animation: 'blink 1s ease-in-out infinite' } : { opacity: 1 }
-                  }
-                >
-                  ${spin['currentBalance'] / 100}
-                </span>
-              </div>
+            <div key={`result_${idx}`}>
               <div>
                 You won:{' '}
                 <span
