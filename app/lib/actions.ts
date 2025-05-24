@@ -586,3 +586,29 @@ export async function recordLocation(formData: FormData) {
 }
 
 // verify jwt for session
+
+// get inventory items
+export async function getInventoryItems(userId) {
+  const client = await pool.connect();
+  try {
+    const inventory = await client.query(
+      `
+        SELECT weapon_skins.price, weapon_skins.name as skin_name,
+        weapon_skins.fill_style, weapon_skins.image_url,
+        user_skins_inventory.date as acquired_date,
+        weapon_skins.rarity
+        FROM user_skins_inventory
+        INNER JOIN weapon_skins ON weapon_skins.skin_id = user_skins_inventory.skin_id
+        WHERE user_id=$1
+        ORDER BY user_skins_inventory.date DESC;
+        `,
+      [userId]
+    );
+    return inventory.rows;
+  } catch (error) {
+    console.error('Database error. Fetching user inventory:', error);
+    throw error;
+  } finally {
+    await client.release();
+  }
+}
