@@ -8,7 +8,7 @@ import Cases from '@/app/ui/cases';
 const SESSION_ID_COOKIE_NAME = 'SESSION_ID';
 
 export default async function Page() {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const sessionIdCookie = cookieStore.get(SESSION_ID_COOKIE_NAME);
   if (!(sessionIdCookie && sessionIdCookie.value != '')) {
     redirect('/');

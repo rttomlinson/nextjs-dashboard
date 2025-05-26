@@ -1,12 +1,13 @@
 'use client';
-import { useFormState } from 'react-dom';
+import { useActionState } from 'react';
+
 import { claimDailyReward } from '@/app/lib/actions';
 import Button from '@mui/material/Button';
 import Alert from '@mui/material/Alert';
 
 export default function Form() {
   const initialState = { errors: {}, message: null };
-  const [state, dispatch] = useFormState(claimDailyReward, initialState);
+  const [state, dispatch] = useActionState(claimDailyReward, initialState);
   return (
     <main>
       <form action={dispatch}>

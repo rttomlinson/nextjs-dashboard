@@ -63,18 +63,19 @@ async function fetchFilteredBets(userId: string) {
   }
 }
 
-export default async function Page({
-  searchParams
-}: {
-  searchParams?: {
-    query?: string;
-    page?: string;
-  };
-}) {
+export default async function Page(
+  props: {
+    searchParams?: Promise<{
+      query?: string;
+      page?: string;
+    }>;
+  }
+) {
+  const searchParams = await props.searchParams;
   const query = searchParams?.query || '';
   const currentPage = Number(searchParams?.page) || 1;
 
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const sessionId = cookieStore.get('SESSION_ID');
 
   // undefined means that SESSION_ID cookie not found

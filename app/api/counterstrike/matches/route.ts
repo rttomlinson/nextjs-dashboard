@@ -69,7 +69,7 @@ async function getUpcomingCounterStrikeMatches() {
 }
 
 export async function GET(request: NextRequest) {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const sessionIdCookie = cookieStore.get(SESSION_ID_COOKIE_NAME);
   let currentUser;
   // console.log(sessionIdCookie);

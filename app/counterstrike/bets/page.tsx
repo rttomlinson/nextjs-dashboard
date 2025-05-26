@@ -87,7 +87,7 @@ async function getCounterStrikeBetsForUser(userId: string) {
 }
 
 export default async function Page() {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const sessionId = cookieStore.get('SESSION_ID');
   // undefined means that SESSION_ID cookie not found
   if (!sessionId) {

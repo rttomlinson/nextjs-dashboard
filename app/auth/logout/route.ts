@@ -6,7 +6,7 @@ import { createClient } from 'redis';
 const SESSION_ID_COOKIE_NAME = 'SESSION_ID';
 
 export async function GET(request: Request) {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
 
   const sessionId = cookieStore.get(SESSION_ID_COOKIE_NAME);
   if (!(sessionId && sessionId.value != '')) {

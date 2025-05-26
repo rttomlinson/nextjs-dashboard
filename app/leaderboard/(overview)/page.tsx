@@ -16,7 +16,7 @@ import { getAllBalances, getApplicationUserSessionData } from '@/app/lib/actions
 const { createHash } = require('node:crypto');
 
 export default async function Page() {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const sessionIdCookie = cookieStore.get(SESSION_ID_COOKIE_NAME);
   if (!(sessionIdCookie && sessionIdCookie.value != '')) {
     redirect('/');

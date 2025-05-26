@@ -5,8 +5,7 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import Alert from '@mui/material/Alert';
 
-import { useFormState } from 'react-dom';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useActionState } from 'react';
 import { createBet } from '@/app/lib/actions';
 import {
   APIProvider,
@@ -104,7 +103,7 @@ export default function Form() {
   const [selectedPlace, setSelectedPlace] = useState(null);
 
   const initialState = { errors: {}, message: null };
-  const [state, dispatch] = useFormState(createBet, initialState);
+  const [state, dispatch] = useActionState(createBet, initialState);
 
   // If user doesn't give access to location, just default to 0,0 (Or maybe their address if we have it to pass as props
   const [position, setPosition] = useState({ lat: 0, lng: 0 });

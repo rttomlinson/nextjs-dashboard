@@ -11,13 +11,13 @@ import utc from 'dayjs/plugin/utc';
 dayjs.extend(utc);
 
 export async function POST(request: NextRequest) {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const sessionIdCookie = cookieStore.get(SESSION_ID_COOKIE_NAME);
   if (!(sessionIdCookie && sessionIdCookie.value != '')) {
     return NextResponse.json({ error: 'Session not found. Reauthenciation recommended.' }, { status: 400 });
   }
   const sessionData = await getApplicationUserSessionData(sessionIdCookie.value);
-  let userId = sessionData?.userId;
+  let userId = sessionData['user_id'];
   if (!userId) {
     return NextResponse.json({ error: 'Session not found. Reauthenciation recommended.' }, { status: 400 });
   }

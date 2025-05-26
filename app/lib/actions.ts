@@ -62,7 +62,7 @@ export type State = {
 
 export async function createBet(previousState: State, formData: FormData) {
   // get user id of session
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const sessionId = cookieStore.get('SESSION_ID');
   if (!(sessionId && sessionId.value != '')) {
     redirect('/');
@@ -184,7 +184,7 @@ type Team = {
 };
 export async function placeCounterStrikeBet(previousState: CounterStrikeBetState, formData: FormData) {
   // get user id of session
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const sessionId = cookieStore.get('SESSION_ID');
   if (!(sessionId && sessionId.value != '')) {
     redirect('/');
@@ -307,7 +307,7 @@ export type ClaimDailyRewardsState = {
 };
 export async function claimDailyReward(previousState: ClaimDailyRewardsState, formData: FormData) {
   // get user id of session
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const sessionId = cookieStore.get('SESSION_ID');
   if (!(sessionId && sessionId.value != '')) {
     redirect('/');
@@ -435,7 +435,7 @@ export async function getAllBalances() {
 }
 
 export async function login(formData: FormData) {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
 
   // Does a session already exist?
   const sessionId = cookieStore.get('USER_SESSION_ID');
@@ -496,7 +496,7 @@ export async function login(formData: FormData) {
 }
 
 export async function logout() {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const sessionId = cookieStore.get('SESSION_ID');
   if (!(sessionId && sessionId.value != '')) {
     redirect('/');
@@ -566,7 +566,7 @@ export async function getApplicationUserSessionData(sessionId) {
 }
 
 export async function getUser() {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const sessionIdCookie = cookieStore.get(SESSION_ID_COOKIE_NAME);
   let currentUser = null;
 

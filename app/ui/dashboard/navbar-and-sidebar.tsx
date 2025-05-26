@@ -1,9 +1,11 @@
 'use client';
 import { useRouter, redirect } from 'next/navigation';
-import { revalidatePath } from 'next/cache';
+// import { revalidatePath } from 'next/cache';
 
 import { useContext, useState } from 'react';
 import AuthContext from '@/stores/authContext';
+import { AuthContextProvider } from '@/stores/authContext';
+
 import { login, logout } from '@/app/lib/actions';
 
 import React from 'react';
@@ -60,7 +62,7 @@ let getLocationPromise = (): Promise<GeolocationPosition> => {
 
 const drawerWidth = 240;
 
-export default function NavbarAndSidebar({ children }) {
+export default function NavbarAndSidebar({ children, currentUser }) {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [recordStatus, updateRecordStatus] = useState(null);
   const open = Boolean(anchorEl);
@@ -71,7 +73,8 @@ export default function NavbarAndSidebar({ children }) {
     setAnchorEl(null);
   };
 
-  const { user, setUser } = React.useContext(AuthContext);
+  const [user, setUser] = React.useState(currentUser);
+
   let loggedIn = user;
 
   const router = useRouter();
@@ -233,135 +236,138 @@ export default function NavbarAndSidebar({ children }) {
   };
 
   return (
-    <Box sx={{ display: 'flex' }}>
-      <CssBaseline />
-      <AppBar
-        position="fixed"
-        sx={{
-          zIndex: theme => theme.zIndex.drawer + 1
-        }}
-      >
-        <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            edge="start"
-            onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { sm: 'none' } }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography sx={{ minWidth: 100, flexGrow: 1 }} component="div">
-            <AdbIcon />
-          </Typography>
-          {loggedIn ? (
-            <Tooltip title="Account settings">
-              <IconButton
-                onClick={handleClick}
-                size="small"
-                sx={{ ml: 2 }}
-                aria-controls={open ? 'account-menu' : undefined}
-                aria-haspopup="true"
-                aria-expanded={open ? 'true' : undefined}
-              >
-                <Avatar alt={user.name} src={user.image} sx={{ width: 32, height: 32 }}></Avatar>
-              </IconButton>
-            </Tooltip>
-          ) : (
-            <Button color="inherit" onClick={() => login(new FormData())}>
-              Login
-            </Button>
-          )}
-        </Toolbar>
-      </AppBar>
-      <Menu
-        anchorEl={anchorEl}
-        id="account-menu"
-        open={open}
-        onClose={handleClose}
-        onClick={handleClose}
-        PaperProps={{
-          elevation: 0,
-          sx: {
-            overflow: 'visible',
-            filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
-            mt: 1.5,
-            '& .MuiAvatar-root': {
-              width: 32,
-              height: 32,
-              ml: -0.5,
-              mr: 1
-            },
-            '&::before': {
-              content: '""',
-              display: 'block',
-              position: 'absolute',
-              top: 0,
-              right: 14,
-              width: 10,
-              height: 10,
-              bgcolor: 'background.paper',
-              transform: 'translateY(-50%) rotate(45deg)',
-              zIndex: 0
-            }
-          }
-        }}
-        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-      >
-        <MenuItem
-          onClick={() => {
-            handleClose();
-            router.push('/account');
+    <AuthContextProvider currentUser={currentUser}>
+      {' '}
+      <Box sx={{ display: 'flex' }}>
+        <CssBaseline />
+        <AppBar
+          position="fixed"
+          sx={{
+            zIndex: theme => theme.zIndex.drawer + 1
           }}
         >
-          <Avatar /> My account
-        </MenuItem>
-        <Divider />
-        <MenuItem onClick={onLogoutClick}>
-          <ListItemIcon>
-            <Logout fontSize="small" />
-          </ListItemIcon>
-          Logout
-        </MenuItem>
-      </Menu>
-      {loggedIn ? (
-        <Box component="nav" sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }} aria-label="mailbox folders">
-          {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
-          <Drawer
-            // container={container}
-            variant="temporary"
-            open={mobileOpen}
-            onTransitionEnd={handleDrawerTransitionEnd}
-            onClose={handleDrawerClose}
-            ModalProps={{
-              keepMounted: true // Better open performance on mobile.
-            }}
-            sx={{
-              display: { xs: 'block', sm: 'none' },
-              '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth }
+          <Toolbar>
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              edge="start"
+              onClick={handleDrawerToggle}
+              sx={{ mr: 2, display: { sm: 'none' } }}
+            >
+              <MenuIcon />
+            </IconButton>
+            <Typography sx={{ minWidth: 100, flexGrow: 1 }} component="div">
+              <AdbIcon />
+            </Typography>
+            {loggedIn ? (
+              <Tooltip title="Account settings">
+                <IconButton
+                  onClick={handleClick}
+                  size="small"
+                  sx={{ ml: 2 }}
+                  aria-controls={open ? 'account-menu' : undefined}
+                  aria-haspopup="true"
+                  aria-expanded={open ? 'true' : undefined}
+                >
+                  <Avatar alt={user.name} src={user.image} sx={{ width: 32, height: 32 }}></Avatar>
+                </IconButton>
+              </Tooltip>
+            ) : (
+              <Button color="inherit" onClick={() => login(new FormData())}>
+                Login
+              </Button>
+            )}
+          </Toolbar>
+        </AppBar>
+        <Menu
+          anchorEl={anchorEl}
+          id="account-menu"
+          open={open}
+          onClose={handleClose}
+          onClick={handleClose}
+          PaperProps={{
+            elevation: 0,
+            sx: {
+              overflow: 'visible',
+              filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+              mt: 1.5,
+              '& .MuiAvatar-root': {
+                width: 32,
+                height: 32,
+                ml: -0.5,
+                mr: 1
+              },
+              '&::before': {
+                content: '""',
+                display: 'block',
+                position: 'absolute',
+                top: 0,
+                right: 14,
+                width: 10,
+                height: 10,
+                bgcolor: 'background.paper',
+                transform: 'translateY(-50%) rotate(45deg)',
+                zIndex: 0
+              }
+            }
+          }}
+          transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+          anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+        >
+          <MenuItem
+            onClick={() => {
+              handleClose();
+              router.push('/account');
             }}
           >
-            {drawer()}
-          </Drawer>
-          <Drawer
-            variant="permanent"
-            sx={{
-              display: { xs: 'none', sm: 'block' },
-              '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth }
-            }}
-            open
-          >
-            {drawer()}
-          </Drawer>
+            <Avatar /> My account
+          </MenuItem>
+          <Divider />
+          <MenuItem onClick={onLogoutClick}>
+            <ListItemIcon>
+              <Logout fontSize="small" />
+            </ListItemIcon>
+            Logout
+          </MenuItem>
+        </Menu>
+        {loggedIn ? (
+          <Box component="nav" sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }} aria-label="mailbox folders">
+            {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
+            <Drawer
+              // container={container}
+              variant="temporary"
+              open={mobileOpen}
+              onTransitionEnd={handleDrawerTransitionEnd}
+              onClose={handleDrawerClose}
+              ModalProps={{
+                keepMounted: true // Better open performance on mobile.
+              }}
+              sx={{
+                display: { xs: 'block', sm: 'none' },
+                '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth }
+              }}
+            >
+              {drawer()}
+            </Drawer>
+            <Drawer
+              variant="permanent"
+              sx={{
+                display: { xs: 'none', sm: 'block' },
+                '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth }
+              }}
+              open
+            >
+              {drawer()}
+            </Drawer>
+          </Box>
+        ) : (
+          <></>
+        )}
+        <Box component="main" sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` } }}>
+          <Toolbar />
+          {children}
         </Box>
-      ) : (
-        <></>
-      )}
-      <Box component="main" sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` } }}>
-        <Toolbar />
-        {children}
       </Box>
-    </Box>
+    </AuthContextProvider>
   );
 }

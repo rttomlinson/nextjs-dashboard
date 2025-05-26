@@ -1,4 +1,6 @@
 'use client';
+import { useEffect, useState } from 'react';
+import { Button } from '@mui/material';
 
 type WEAPON_SKIN = {
   price: number;
@@ -12,9 +14,10 @@ type WEAPON_SKIN = {
 //     [0]   }
 
 export default function Inventory({ initialInventory }) {
-  console.log('Initial Inventory:', initialInventory);
+  //   console.log('Initial Inventory:', initialInventory);
+  const [skinsInventory, setSkinsInventory] = useState(initialInventory);
 
-  const inventory = initialInventory.map((item, idx) => {
+  const inventory = skinsInventory.map((item, idx) => {
     return (
       <div key={`weapon_skin_inventory_${idx}`} style={{ margin: '10px', minWidth: '300px' }}>
         <h2>{item.skin_name}</h2>
@@ -27,6 +30,42 @@ export default function Inventory({ initialInventory }) {
   return (
     <div>
       <h1>Inventory</h1>
+      <Button
+        onClick={() => {
+          console.log('Sell all skins');
+
+          // check if there are any skins to sell
+          // if not, then return early (no-op)
+
+          fetch('/api/counterstrike/inventory/sell', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({})
+          })
+            .then(response => {
+              if (response.status === 200) {
+                console.log('Sell all skins response:', response);
+                // Assuming the response contains the updated inventory?
+                // Need to get the updated user balance too
+
+                setSkinsInventory([]);
+
+                return response.json();
+              } else if (response.status === 204) {
+                return;
+              } else {
+                throw new Error('Failed to sell all skins');
+              }
+            })
+            .catch(error => {
+              console.error('Error selling all skins:', error);
+            });
+        }}
+      >
+        Sell all skins
+      </Button>
       <div style={{ display: 'flex', flexWrap: 'wrap' }}>{inventory}</div>
     </div>
   );

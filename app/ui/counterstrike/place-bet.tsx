@@ -1,13 +1,12 @@
 'use client';
 
-import { useFormState } from 'react-dom';
 // import { useState, useRef, useEffect } from 'react';
 import { placeCounterStrikeBet } from '@/app/lib/actions';
 import { styled } from '@mui/material/styles';
 
 import Alert from '@mui/material/Alert';
 import CheckIcon from '@mui/icons-material/Check';
-import React from 'react';
+import React, { useActionState } from 'react';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 
@@ -60,7 +59,7 @@ export default function Form(props: {
 }) {
   // TODO: Make it so you can't specify the team nor the matchId directly
   const initialState = { errors: {}, message: null };
-  const [state, dispatch] = useFormState(placeCounterStrikeBet, initialState);
+  const [state, dispatch] = useActionState(placeCounterStrikeBet, initialState);
 
   // console.log(state);
   const matchId = props.matchId;

@@ -19,7 +19,7 @@ export async function GET(request: Request) {
   // is it the same initiator? (can't use cookies here) - but is still a proxy for session
   console.log(searchParams.get('state'));
   console.log('inside /auth path');
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const codeVerifier = cookieStore.get('my_special_cookies_code_verifier').value;
   console.log(`code verifier: ${codeVerifier}`);
 
