@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { Button } from '@mui/material';
+import { useRouter } from 'next/navigation';
 
 type WEAPON_SKIN = {
   price: number;
@@ -15,6 +16,7 @@ type WEAPON_SKIN = {
 
 export default function Inventory({ initialInventory }) {
   //   console.log('Initial Inventory:', initialInventory);
+  const router = useRouter();
   const [skinsInventory, setSkinsInventory] = useState(initialInventory);
 
   const inventory = skinsInventory.map((item, idx) => {
@@ -42,7 +44,8 @@ export default function Inventory({ initialInventory }) {
             headers: {
               'Content-Type': 'application/json'
             },
-            body: JSON.stringify({})
+            body: JSON.stringify({}),
+            cache: 'no-store' // Ensure we get the latest data
           })
             .then(response => {
               if (response.status === 200) {
@@ -51,6 +54,7 @@ export default function Inventory({ initialInventory }) {
                 // Need to get the updated user balance too
 
                 setSkinsInventory([]);
+                router.refresh();
 
                 return response.json();
               } else if (response.status === 204) {
