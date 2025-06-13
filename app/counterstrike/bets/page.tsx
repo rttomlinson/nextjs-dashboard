@@ -71,8 +71,8 @@ async function getCounterStrikeBetsForUser(userId: string) {
       FROM counterstrike_bets
       JOIN counterstrike_matches ON counterstrike_bets.match_id=counterstrike_matches.match_id
       WHERE counterstrike_bets.user_id=$1
-      ORDER BY counterstrike_bets.date ASC
-      LIMIT 20
+      ORDER BY counterstrike_bets.date DESC
+      LIMIT 40
     `,
       [userId]
     );
