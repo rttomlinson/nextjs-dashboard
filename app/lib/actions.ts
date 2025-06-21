@@ -206,10 +206,11 @@ export async function placeCounterStrikeBet(previousState: CounterStrikeBetState
         `,
       [userId]
     );
-    // Hard-code $500 USD bet size
-    // 50000 cents
-    const betAmount = 500;
-    const betAmountInCents = 500 * 100;
+    const betAmount = Number(formData.get('amount'));
+    if (isNaN(betAmount)) {
+      console.error('Invalid number');
+    }
+    const betAmountInCents = betAmount * 100;
     const balance = account.rows[0].balance;
     const now = dayjs.utc();
     if (balance < betAmount * 100) {

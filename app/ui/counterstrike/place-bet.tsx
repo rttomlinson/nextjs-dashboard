@@ -64,16 +64,16 @@ export default function Form(props: {
   // console.log(state);
   const matchId = props.matchId;
 
-  // const [value, setValue] = React.useState<number | undefined>(500);
+  const [value, setValue] = React.useState<number | undefined>(500);
 
   // // const handleSliderChange = (event: Event, newValue: number | number[] | string) => {
   // //   setValue(newValue as number);
   // // };
-  // const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-  //   // setValue(event.target.value === '' ? 0 : Number(event.target.value));
-  //   // if type text and cannot be coerced into a number then set to empty
-  //   setValue(event.target.value == '' ? undefined : Number(event.target.value));
-  // };
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    // setValue(event.target.value === '' ? 0 : Number(event.target.value));
+    // if type text and cannot be coerced into a number then set to empty
+    setValue(event.target.value == '' ? undefined : Number(event.target.value));
+  };
 
   // TODO: Toggle for UTC
 
@@ -115,16 +115,17 @@ export default function Form(props: {
                 </Grid>
                 <Grid>
                   <Input
-                    disabled={true}
-                    // value={value}
-                    defaultValue={500}
+                    // disabled={true}
+                    value={value}
+                    name="amount"
+                    // defaultValue={500}
                     size="small"
-                    // onChange={handleInputChange}
+                    onChange={handleInputChange}
                     // onBlur={handleBlur}
                     inputProps={{
-                      step: 1,
-                      min: 1,
-                      max: 1000,
+                      step: 100,
+                      min: 100,
+                      max: 10000,
                       type: 'number',
                       'aria-labelledby': 'input-slider'
                     }}
