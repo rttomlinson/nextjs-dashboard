@@ -221,13 +221,6 @@ export default function Cases({ userBalance }) {
       images[skin.name] = { canvasImage: skinImage, ...skin };
     });
 
-    // const caseImage = new Image();
-    // caseImage.src = cases[0].src;
-
-    // images['case_revolution'] = { image: caseImage, fillStyle: 'rgb(236, 217, 198)' };
-
-    ////////////////////////
-
     const durationCounter = 500;
     const durationCounterOffset = Math.floor(Math.random() * 100) * (Math.round(Math.random()) ? -1 : 1);
 
@@ -314,11 +307,6 @@ export default function Cases({ userBalance }) {
             style={{
               width: `${viewWidth}px`,
               borderStyle: 'solid'
-              // backgroundImage: `url(${bg.src})`,
-              // backgroundSize: 'cover',
-              // backgroundRepeat: 'repeat-y',
-              // width: '100px',
-              // ...reelStyle1
             }}
           >
             <canvas ref={canvasRef} width={imagePixelWidth * 2} height={288} style={{ position: 'absolute' }}></canvas>

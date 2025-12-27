@@ -7,7 +7,6 @@ import dayjs from 'dayjs';
 dayjs.extend(utc);
 import utc from 'dayjs/plugin/utc';
 
-// import { useState } from 'react';
 export type Match = {
   id: string;
   tournament_id: string;
